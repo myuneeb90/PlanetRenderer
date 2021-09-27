@@ -81,11 +81,8 @@ public class GridGeometryScript
     public GridGeometryScript(float size, int divisions, Material material)
     {
         GridMaterial = material;
-
         State = GridGeometryStates.AVAILABLE;
         this.Construct(size, divisions);
-
-      //  GridMesh.Prepare();      
     }
 
     public void Construct(float size, int divisions)
@@ -96,8 +93,6 @@ public class GridGeometryScript
         int divOffsetMinusOne =  divOffset - 1;    
 
         GridMesh = new GridMeshScript();
-
-    //    List<Vector3> edgeVertices = new List<Vector3>();
 
         for(int z = 0; z < divisions + divOffset; z++)
         {
@@ -133,13 +128,9 @@ public class GridGeometryScript
         }  
     }
 
- //   int xIdx = 0, zIdx = 0;
-
-    public void Process()//Vector3 center, float size, int divisions)
+    public void Process(float radius)
     {
-  //      this.IsOccupied = isOccupied;
-  //      State = GridGeometryStates.INPROCESS;
-        Vector3 orientationAngles = this.GetOrientationAngles(FaceType);
+        Vector3 orientationAngles = GridHelperScript.GetOrientationAngles(FaceType);
         FaceMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(orientationAngles), Vector3.one);
 
 
@@ -157,55 +148,20 @@ public class GridGeometryScript
 
                 vertex.x = Center.x + (-halfSize + edgeLength * x);
                 vertex.z = Center.z + (halfSize - edgeLength * z);
-                vertex.y = Mathf.PerlinNoise(512 + vertex.x * 0.01f, 512 + vertex.z * 0.01f) * 50;    
+                vertex.y = Center.y; 
+                Vector3 cubePos = FaceMatrix.MultiplyVector(vertex);
+                Vector3 spherePos = GridHelperScript.GetCubeToSpherePosition(cubePos);
 
-                GridMesh.VertexBuffer[idx] = vertex;
+                GridMesh.VertexBuffer[idx] = spherePos * radius;
                 // GridMesh.NormalBuffer[idx] = Vector3.up;
                 // GridMesh.TexcoordBuffer[idx] = new Vector2();
                 // GridMesh.TangentBuffer[idx] = new Vector4();    
-           //     xIdx++;
             }
-         //   zIdx++;
         }
 
         GridMesh.Center = Center;
 
         State = GridGeometryStates.ISREADY;
-
-        // if(xIdx < Divisions + divOffset && zIdx < Divisions + divOffset)
-        // {
-        //     xIdx++;
-        // }
-        // else
-        // if(xIdx == Divisions + divOffset && zIdx < Divisions + divOffset)
-        // {
-        //     zIdx++;
-
-        //     if(zIdx < Divisions + divOffset)
-        //     {
-        //         xIdx = 0;
-        //     }
-
-        // }
-        // else
-        // if(xIdx < Divisions + divOffset && zIdx == Divisions + divOffset)
-        // {
-        //     zIdx = 0;
-        //     xIdx++;
-        // }
-        //else
-//        if(xIdx == Divisions + divOffset && zIdx == Divisions + divOffset)
-//        {
-        //    GridMesh.Prepare();    
-    
-            // xIdx = 0;
-            // zIdx = 0;
-
-         //   State = GridGeometryStates.ISRENDERING;
- //       }
-
-  //      Debug.Log("xIdx : " + xIdx + " : zIdx : " + zIdx + " : divisions + divOffset : " + (Divisions + divOffset));
-
     }
 
     public void Prepare(Camera sceneCamera)
@@ -216,47 +172,8 @@ public class GridGeometryScript
 
     public void Render()
     {
-      //  if(IsOccupied == true)
-  //      if(State == GridGeometryStates.ISRENDERING)
-  //      {
-            Graphics.DrawMesh(GridMesh.Mesh, Matrix4x4.identity, GridMaterial, 0);
-  //      }
+        Graphics.DrawMesh(GridMesh.Mesh, Matrix4x4.identity, GridMaterial, 0);
     }
 
-    public Vector3 GetOrientationAngles(GridFaceType faceType)
-    {
-        Vector3 orientationAngles = new Vector3();
-
-        if(faceType == GridFaceType.TOP)
-        {
-            orientationAngles = new Vector3(0, 0, 0);
-        }
-        else
-        if(faceType == GridFaceType.BOTTOM)
-        {
-            orientationAngles = new Vector3(0, 0, 180);
-        }
-        else
-        if(faceType == GridFaceType.RIGHT)
-        {
-            orientationAngles = new Vector3(0, 0, -90);
-        }
-        else
-        if(faceType == GridFaceType.LEFT)
-        {
-            orientationAngles = new Vector3(0, 0, 90);
-        }
-        else
-        if(faceType == GridFaceType.FRONT)
-        {
-            orientationAngles = new Vector3(90, 0, 0);
-        }
-        else
-        if(faceType == GridFaceType.BACK)
-        {
-            orientationAngles = new Vector3(-90, 0, 0);
-        } 
-
-        return orientationAngles;
-    }
+    
 }

@@ -154,6 +154,7 @@ MonoBehaviour:
   Size: 2048
   Divisions: 32
   GridPoolCount: 500
+  Radius: 1024
   SceneCamera: {fileID: 1038627902}
   Material: {fileID: 2100000, guid: 8743c4d295b30ac40a5ec82570439642, type: 2}
 --- !u!4 &834735150
@@ -255,13 +256,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 852146219}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: -0.18318067, y: -0.66859037, z: 0.31206122, w: 0.6496533}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 10.328, y: -87.73601, z: 41.385002}
 --- !u!1 &1038627900
 GameObject:
   m_ObjectHideFlags: 0
@@ -273,6 +274,7 @@ GameObject:
   - component: {fileID: 1038627903}
   - component: {fileID: 1038627902}
   - component: {fileID: 1038627901}
+  - component: {fileID: 1038627904}
   m_Layer: 0
   m_Name: SceneCamera
   m_TagString: MainCamera
@@ -339,9 +341,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038627900}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 599, z: -3710}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1038627904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038627900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02fc97d3d4e1757459b32b1971c874c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SceneCamera: {fileID: 1038627902}
+  SunLight: {fileID: 852146220}
+  Planet: {fileID: 834735150}
+  PlanetRadius: 1024
+  AtmosphereRadius: 1090
+  EffectMaterial: {fileID: 2100000, guid: bc97bc0c95ab4e64d833eeeb9d1a9bf5, type: 2}

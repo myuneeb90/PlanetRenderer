@@ -7,7 +7,8 @@ using System.Threading;
 public class PlanetScript : MonoBehaviour
 {
     public int LODDepth;
-    public float Size;
+    [HideInInspector]
+    public float Size = 2.0f;
     public int Divisions;
     public int GridPoolCount;
     public float Radius;
@@ -18,11 +19,11 @@ public class PlanetScript : MonoBehaviour
 
 
     public GridFaceScript TopFace;
-    // public GridFaceScript BottomFace;
-    // public GridFaceScript RightFace;
-    // public GridFaceScript LeftFace;
-    // public GridFaceScript FrontFace;
-    // public GridFaceScript BackFace;
+    public GridFaceScript BottomFace;
+    public GridFaceScript RightFace;
+    public GridFaceScript LeftFace;
+    public GridFaceScript FrontFace;
+    public GridFaceScript BackFace;
 
     public GridPoolScript GridPool;
     private Thread ProcessThread = null;
@@ -33,9 +34,16 @@ public class PlanetScript : MonoBehaviour
 
     void Awake()
     {
-        GridPool = new GridPoolScript(GridPoolCount, 2, Divisions, Material);
+        Size = 2.0f;
+
+        GridPool = new GridPoolScript(GridPoolCount, Size, Divisions, Material);
 
         TopFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.TOP);
+        BottomFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.BOTTOM);
+        RightFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.RIGHT);
+        LeftFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.LEFT);
+        FrontFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.FRONT);
+        BackFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.BACK);
 
         Application.targetFrameRate = 60;
 
@@ -69,8 +77,6 @@ public class PlanetScript : MonoBehaviour
             }
         }
 
-
-
         if(IsProcessDone == true)
         {
             if(ProcessThread != null)
@@ -99,9 +105,14 @@ public class PlanetScript : MonoBehaviour
         if(IsProcessDone == false)
         {
       //      GridPool.ProcessCount = 0;
-            TopFace.Update(CameraPosition, GridPool);
+            TopFace.Update(CameraPosition, Radius, GridPool);
+            BottomFace.Update(CameraPosition, Radius, GridPool);
+            RightFace.Update(CameraPosition, Radius, GridPool);
+            LeftFace.Update(CameraPosition, Radius, GridPool);
+            FrontFace.Update(CameraPosition, Radius, GridPool);
+            BackFace.Update(CameraPosition, Radius, GridPool);
 
-            GridPool.Process();
+            GridPool.Process(Radius);
         }
 
         IsProcessDone = true;

@@ -87,7 +87,7 @@ public class GridNodeScript
 
     public void Update(GridNodeScript parent, GridNodeScript thisNode, Vector3 cameraPosition, 
                        float finalResolution, int maxDepth, int divisions, GridFaceType faceType,
-                       GridPoolScript gridPool)
+                       float radius, GridPoolScript gridPool)
     {
         if(thisNode == null)
         {
@@ -95,11 +95,18 @@ public class GridNodeScript
         }
         else
         {
-            Vector3 newCenter = thisNode.Center;
+            Vector3 orientationAngles = GridHelperScript.GetOrientationAngles(faceType);
+            Matrix4x4 faceMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(orientationAngles), Vector3.one);
+            Vector3 faceCenter = faceMatrix.MultiplyVector(thisNode.Center);
+
+            Vector3 newCenter = GridHelperScript.GetCubeToSpherePosition(faceCenter) * radius;
+
+        //    Debug.Log("newCenter : " + newCenter + " : LODIndex : " + LODIndex);
+
             float viewDistance = (Mathf.Abs(cameraPosition.x - newCenter.x) + 
                                   Mathf.Abs(cameraPosition.y - newCenter.y) + 
                                   Mathf.Abs(cameraPosition.z - newCenter.z));
-            float f = viewDistance / (thisNode.Size * finalResolution);
+            float f = viewDistance / (thisNode.Size * radius * finalResolution);
             if(f < 0.1f)
             {
                 thisNode.State = GridNodeStates.SPLIT;
@@ -119,7 +126,6 @@ public class GridNodeScript
                 // Perform action with LOD Container
                 if(thisNode.GridIndex != -1)
                 {
-                  //  gridLODContainer[thisNode.LODIndex].Container[thisNode.GridIndex].State = GridGeometryStates.AVAILABLE;//IsOccupied = false;
                     gridPool.Container[thisNode.GridIndex].State = GridGeometryStates.AVAILABLE;
                     thisNode.GridIndex = -1;
                 }
@@ -132,7 +138,7 @@ public class GridNodeScript
                         GridNodeTypes type = (GridNodeTypes)(i + 1);
                         thisNode.Children[i] = new GridNodeScript(thisNode, type, thisNode.Center, thisNode.Size);
                     }
-                    thisNode.Update(thisNode, thisNode.Children[i], cameraPosition, finalResolution, maxDepth, divisions, faceType, gridPool);
+                    thisNode.Update(thisNode, thisNode.Children[i], cameraPosition, finalResolution, maxDepth, divisions, faceType, radius, gridPool);
                 }
             }
             else
@@ -145,8 +151,6 @@ public class GridNodeScript
                     {
                         if(thisNode.Children[i].GridIndex != -1)
                         {
-                        //    Debug.Log("LOD Index : " + thisNode.LODIndex + " : GridIndex : " + thisNode.GridIndex);
-                         //   gridLODContainer[thisNode.Children[i].LODIndex].Container[thisNode.Children[i].GridIndex].State = GridGeometryStates.AVAILABLE;//.IsOccupied = false;
                             gridPool.Container[thisNode.Children[i].GridIndex].State = GridGeometryStates.AVAILABLE;
                             thisNode.Children[i].GridIndex = -1;
                         }
@@ -158,18 +162,17 @@ public class GridNodeScript
                 // Construct node mesh
                 if(thisNode.GridIndex == -1)
                 {
-                 //   List<GridGeometryScript> gridContainer = gridLODContainer[thisNode.LODIndex].Container;
                     for(int i = 0; i < gridPool.Container.Count; i++)
                     {
-                        if(gridPool.Container[i].State == GridGeometryStates.AVAILABLE)//.IsOccupied == false)
+                        if(gridPool.Container[i].State == GridGeometryStates.AVAILABLE)
                         {
                             thisNode.GridIndex = i;
                             gridPool.Container[i].Size = thisNode.Size;
                             gridPool.Container[i].Center = thisNode.Center;
+                            
                             gridPool.Container[i].Divisions = divisions;
                             gridPool.Container[i].FaceType = faceType;
                             gridPool.Container[i].State = GridGeometryStates.INPROCESS;
-                        //    gridContainer[i].Update(thisNode.Center, thisNode.Size, divisions);
                             break;
                         }
                     }

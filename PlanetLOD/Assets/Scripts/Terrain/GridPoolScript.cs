@@ -9,53 +9,22 @@ public class GridPoolScript
 
     public GridPoolScript(int gridCount, float size, int divisions, Material material)
     {
-//        LODDepth = lodDepth;
         Container = new List<GridGeometryScript>();
 
         for(int i = 0; i < gridCount; i++)
         {
             Container.Add(new GridGeometryScript(size, divisions, material));
-        }        
-
-        // if(LODDepth == 0)
-        // {
-        //     Container.Add(new GridGeometryScript(size, divisions, material, faceType));
-        // }
-        // else
-        // if(LODDepth == 1)
-        // {
-        //     for(int i = 0; i < 4; i++)
-        //     {
-        //         Container.Add(new GridGeometryScript(size, divisions, material, faceType));
-        //     }
-        // }
-        // else
-        // if(LODDepth == 2)
-        // {
-        //     for(int i = 0; i < 16; i++)
-        //     {
-        //         Container.Add(new GridGeometryScript(size, divisions, material, faceType));
-        //     }
-        // }        
-        // else
-        // if(LODDepth >= 3)
-        // {
-        //     for(int i = 0; i < 96; i++)
-        //     {
-        //         Container.Add(new GridGeometryScript(size, divisions, material, faceType));
-        //     }
-        // }        
+        }           
     }
 
-    public void Process()
+    public void Process(float radius)
     {
-        Debug.Log("Process Count : " + ProcessCount);
-    //    ProcessCount = 0;
+    //    Debug.Log("Process Count : " + ProcessCount);
         for(int i = 0; i < Container.Count; i++)
         {
             if(Container[i].State == GridGeometryStates.INPROCESS)
             {
-                Container[i].Process();
+                Container[i].Process(radius);
                 ProcessCount++;
             }
         } 
