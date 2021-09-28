@@ -17,14 +17,14 @@ public class GridPoolScript
         }           
     }
 
-    public void Process(float radius)
+    public void Process(float radius, CuboidHeightMapScript cuboidHM)
     {
     //    Debug.Log("Process Count : " + ProcessCount);
         for(int i = 0; i < Container.Count; i++)
         {
             if(Container[i].State == GridGeometryStates.INPROCESS)
             {
-                Container[i].Process(radius);
+                Container[i].Process(radius, cuboidHM);
                 ProcessCount++;
             }
         } 

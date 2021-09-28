@@ -128,7 +128,7 @@ public class GridGeometryScript
         }  
     }
 
-    public void Process(float radius)
+    public void Process(float radius, CuboidHeightMapScript cuboidHM)
     {
         Vector3 orientationAngles = GridHelperScript.GetOrientationAngles(FaceType);
         FaceMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(orientationAngles), Vector3.one);
@@ -152,7 +152,9 @@ public class GridGeometryScript
                 Vector3 cubePos = FaceMatrix.MultiplyVector(vertex);
                 Vector3 spherePos = GridHelperScript.GetCubeToSpherePosition(cubePos);
 
-                GridMesh.VertexBuffer[idx] = spherePos * radius;
+                Vector3 uvh = cuboidHM.GetHeightValue(cubePos, FaceType, edgeLength);
+
+                GridMesh.VertexBuffer[idx] = spherePos * (1 + uvh.z) * radius;
                 // GridMesh.NormalBuffer[idx] = Vector3.up;
                 // GridMesh.TexcoordBuffer[idx] = new Vector2();
                 // GridMesh.TangentBuffer[idx] = new Vector4();    

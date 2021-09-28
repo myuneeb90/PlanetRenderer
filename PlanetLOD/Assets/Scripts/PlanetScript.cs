@@ -32,7 +32,35 @@ public class PlanetScript : MonoBehaviour
     private bool IsCameraUpdated = false;
     private int ProcessFrameCountOffset;
 
+    public CaptureCuboidHeightMapScript CaptureCuboidHeightMap;
+    private CuboidHeightMapScript CuboidHM;
+
+    private bool IsReady = false;
+
     void Awake()
+    {
+
+    }
+
+    void Update()
+    {
+        if(CaptureCuboidHeightMap.IsReady == true)
+        {
+            CuboidHM = new CuboidHeightMapScript(CaptureCuboidHeightMap.TopHM, CaptureCuboidHeightMap.BottomHM, 
+                                                 CaptureCuboidHeightMap.RightHM, CaptureCuboidHeightMap.LeftHM, 
+                                                 CaptureCuboidHeightMap.FrontHM, CaptureCuboidHeightMap.BackHM);
+            this.Construct();
+            IsReady = true;
+            CaptureCuboidHeightMap.IsReady = false;
+        }
+
+        if(IsReady == true)
+        {
+            this.Render();
+        }
+    }
+
+    void Construct()
     {
         Size = 2.0f;
 
@@ -50,15 +78,12 @@ public class PlanetScript : MonoBehaviour
         CameraPosition = Vector3.one;
 
         ProcessFrameCountOffset = 10;
-    }
 
-    void Start()
-    {
         ProcessThread = new Thread(ProcessThreadHandler);
         ProcessThread.Start();
     }
 
-    void Update()
+    void Render()
     {
         if(SceneCamera.transform.position != CameraPosition)
         {
@@ -84,7 +109,7 @@ public class PlanetScript : MonoBehaviour
                 ProcessThread = null;
             }
 
-            if(ProcessThread == null && ProcessFrameCountOffset > 0)// && IsCameraUpdated == true)
+            if(ProcessThread == null && ProcessFrameCountOffset > 0)
             {
                 GridPool.Prepare(SceneCamera);
 
@@ -104,7 +129,6 @@ public class PlanetScript : MonoBehaviour
         Debug.Log("Thread Executed Successfully!!!");
         if(IsProcessDone == false)
         {
-      //      GridPool.ProcessCount = 0;
             TopFace.Update(CameraPosition, Radius, GridPool);
             BottomFace.Update(CameraPosition, Radius, GridPool);
             RightFace.Update(CameraPosition, Radius, GridPool);
@@ -112,7 +136,7 @@ public class PlanetScript : MonoBehaviour
             FrontFace.Update(CameraPosition, Radius, GridPool);
             BackFace.Update(CameraPosition, Radius, GridPool);
 
-            GridPool.Process(Radius);
+            GridPool.Process(Radius, CuboidHM);
         }
 
         IsProcessDone = true;
