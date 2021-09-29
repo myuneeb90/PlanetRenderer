@@ -171,7 +171,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -254,7 +254,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -390,6 +390,7 @@ MonoBehaviour:
   SceneCamera: {fileID: 1038627902}
   Material: {fileID: 2100000, guid: 8743c4d295b30ac40a5ec82570439642, type: 2}
   CaptureCuboidHeightMap: {fileID: 666222957}
+  BrushSpawner: {fileID: 1828417915}
 --- !u!4 &834735150
 Transform:
   m_ObjectHideFlags: 0
@@ -415,7 +416,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1024
+  m_Radius: 1062
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &834735152
 MonoBehaviour:
@@ -465,7 +466,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 2
+    m_Type: 0
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -613,7 +614,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038627900}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02fc97d3d4e1757459b32b1971c874c2, type: 3}
   m_Name: 
@@ -753,7 +754,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -836,7 +837,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -920,7 +921,7 @@ MonoBehaviour:
   MouseSensitivityX: 250
   MouseSensitivityY: 250
   MoveSpeed: 100
-  JumpForce: 2200
+  JumpForce: 5200
   GroundedMask:
     serializedVersion: 2
     m_Bits: 256
@@ -1020,7 +1021,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1084,9 +1085,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BrushPrefabContainer:
   - {fileID: 8277662231992851778, guid: 69a31557b1d6c7e488c281b6f9aeef16, type: 3}
+  - {fileID: 8277662231992851778, guid: 4065c16660e45b7499d2c90aa2f28943, type: 3}
   Spawn: 1
   SpawnRadius: 8
-  BrushCount: 400
+  BrushCount: 800
 --- !u!4 &1828417916
 Transform:
   m_ObjectHideFlags: 0
@@ -1151,7 +1153,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

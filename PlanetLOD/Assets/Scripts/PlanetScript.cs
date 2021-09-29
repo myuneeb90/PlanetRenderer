@@ -33,13 +33,19 @@ public class PlanetScript : MonoBehaviour
     private int ProcessFrameCountOffset;
 
     public CaptureCuboidHeightMapScript CaptureCuboidHeightMap;
+    public BrushSpawnerScript BrushSpawner;
     private CuboidHeightMapScript CuboidHM;
 
     private bool IsReady = false;
 
-    void Awake()
-    {
 
+    void Start()
+    {
+        if(BrushSpawner.Spawn == true)
+        {
+            BrushSpawner.SpawnBrushes();
+            CaptureCuboidHeightMap.CaptureCubemap = true;
+        }
     }
 
     void Update()

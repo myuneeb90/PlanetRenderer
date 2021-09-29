@@ -26,6 +26,7 @@ public class HeightMapScript
 
     public float GetHeightValue(int x, int y)
     {
+    //    return Data[x % (Width - 1), y % (Height - 1)];
         return Data[x, y];
     }
 }

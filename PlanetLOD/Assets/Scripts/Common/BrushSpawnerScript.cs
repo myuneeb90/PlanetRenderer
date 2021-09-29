@@ -11,13 +11,13 @@ public class BrushSpawnerScript : MonoBehaviour
     public float SpawnRadius = 5.0f;
     public int BrushCount = 100;
 
-    void Awake()
-    {
-        if(Spawn == true)
-        {
-            SpawnBrushes();
-        }
-    }
+    // void Awake()
+    // {
+    //     if(Spawn == true)
+    //     {
+    //         SpawnBrushes();
+    //     }
+    // }
 
     public void SpawnBrushes()
     {
@@ -34,12 +34,12 @@ public class BrushSpawnerScript : MonoBehaviour
             
             if(brushId == 0)
             {
-                scale = UnityEngine.Random.Range(0.5f, 1.5f);
+                scale = UnityEngine.Random.Range(1.5f, 3.5f);
             }
             else
             if(brushId == 1)
             {
-                scale = UnityEngine.Random.Range(1.0f, 3.0f);
+                scale = UnityEngine.Random.Range(0.8f, 3.0f);
             }
 
 			newBrush.transform.localScale = new Vector3(scale, scale, -scale);
