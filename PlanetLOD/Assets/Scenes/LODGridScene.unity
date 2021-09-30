@@ -416,7 +416,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1062
+  m_Radius: 1064
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &834735152
 MonoBehaviour:
@@ -614,7 +614,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038627900}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 02fc97d3d4e1757459b32b1971c874c2, type: 3}
   m_Name: 
@@ -624,6 +624,13 @@ MonoBehaviour:
   Planet: {fileID: 834735150}
   PlanetRadius: 1024
   AtmosphereRadius: 1090
+  InScatteringPoints: 10
+  OpticalDepthPoints: 10
+  DensityFallOff: 12
+  WaveLengths: {x: 700, y: 530, z: 440}
+  WaveLengthsColor: {r: 0, g: 0, b: 0, a: 0}
+  ScatteringStrength: 1
+  AtmosphereScale: 1
   EffectMaterial: {fileID: 2100000, guid: bc97bc0c95ab4e64d833eeeb9d1a9bf5, type: 2}
 --- !u!1 &1095861030
 GameObject:
@@ -921,7 +928,7 @@ MonoBehaviour:
   MouseSensitivityX: 250
   MouseSensitivityY: 250
   MoveSpeed: 100
-  JumpForce: 5200
+  JumpForce: 2200
   GroundedMask:
     serializedVersion: 2
     m_Bits: 256

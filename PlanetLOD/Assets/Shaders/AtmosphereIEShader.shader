@@ -17,6 +17,11 @@
 
             #include "UnityCG.cginc"
 
+            #define saturate(a) clamp( a, 0.0, 1.0 )
+            #define PI 3.141592
+            #define PRIMARY_STEP_COUNT 16
+            #define LIGHT_STEP_COUNT 8            
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -91,6 +96,109 @@
                 
                 return (t1 >= 0.0);
             }
+
+            float3 SampleLightRay(float3 origin, float3 sunDir, float planetScale, float planetRadius, float totalRadius,
+                                  float rayleighScale, float mieScale, float absorptionHeightMax, float absorptionFalloff) 
+            {
+                float t0, t1;
+                RayIntersectsSphere(origin, sunDir, PlanetCenter, totalRadius, t0, t1);
+                float actualLightStepSize = (t1 - t0) / float(LIGHT_STEP_COUNT);
+                float virtualLightStepSize = actualLightStepSize * planetScale;
+                float lightStepPosition = 0.0;
+                float3 opticalDepthLight = float3(0.0, 0.0, 0.0);
+                for (int j = 0; j < LIGHT_STEP_COUNT; j++) {
+                float3 currentLightSamplePosition = origin + sunDir * (lightStepPosition + actualLightStepSize * 0.5);
+                // Calculate the optical depths and accumulate
+                float currentHeight = length(currentLightSamplePosition) - planetRadius;
+                float currentOpticalDepthRayleigh = exp(-currentHeight / rayleighScale) * virtualLightStepSize;
+                float currentOpticalDepthMie = exp(-currentHeight / mieScale) * virtualLightStepSize;
+                float currentOpticalDepthOzone = (1.0 / cosh((absorptionHeightMax - currentHeight) / absorptionFalloff));
+                currentOpticalDepthOzone *= currentOpticalDepthRayleigh * virtualLightStepSize;
+                opticalDepthLight += float3(
+                    currentOpticalDepthRayleigh,
+                    currentOpticalDepthMie,
+                    currentOpticalDepthOzone);
+                lightStepPosition += actualLightStepSize;
+                }
+                return opticalDepthLight;
+            }
+
+
+            void _ComputeScattering(float3 worldSpacePos, float3 rayDirection, float3 rayOrigin, float3 sunDir,
+                                    out float3 scatteringColour, out float3 scatteringOpacity) 
+            {
+                scatteringColour = float3(0,0,0);
+                float3 betaRayleigh = float3(5.5e-6, 13.0e-6, 22.4e-6);
+                float betaMie = 21e-6;
+                float3 betaAbsorption = float3(2.04e-5, 4.97e-5, 1.95e-6);
+                float g = 0.76;
+                float sunIntensity = 40.0;
+                float planetRadius = PlanetRadius;
+                float atmosphereRadius = AtmosphereRadius - planetRadius;
+                float totalRadius = planetRadius + atmosphereRadius;
+                float referencePlanetRadius = 6371000.0;
+                float referenceAtmosphereRadius = 100000.0;
+                float referenceTotalRadius = referencePlanetRadius + referenceAtmosphereRadius;
+                float referenceRatio = referencePlanetRadius / referenceAtmosphereRadius;
+                float scaleRatio = planetRadius / atmosphereRadius;
+                float planetScale = referencePlanetRadius / planetRadius;
+                float atmosphereScale = scaleRatio / referenceRatio;
+                float maxDist = distance(worldSpacePos, rayOrigin);
+                float rayleighScale = 8500.0 / (planetScale * atmosphereScale);
+                float mieScale = 1200.0 / (planetScale * atmosphereScale);
+                float absorptionHeightMax = 32000.0 * (planetScale * atmosphereScale);
+                float absorptionFalloff = 3000.0 / (planetScale * atmosphereScale);;
+                float mu = dot(rayDirection, sunDir);
+                float mumu = mu * mu;
+                float gg = g * g;
+                float phaseRayleigh = 3.0 / (16.0 * PI) * (1.0 + mumu);
+                float phaseMie = 3.0 / (8.0 * PI) * ((1.0 - gg) * (mumu + 1.0)) / (pow(1.0 + gg - 2.0 * mu * g, 1.5) * (2.0 + gg));
+                // Early out if ray doesn't intersect atmosphere.
+                float t0, t1;
+                if (!RayIntersectsSphere(rayOrigin, rayDirection, PlanetCenter, totalRadius, t0, t1)) {
+                scatteringOpacity = float3(1.0, 1.0, 1.0);
+                return;
+                }
+                // Clip the ray between the camera and potentially the planet surface.
+                t0 = max(0.0, t0);
+                t1 = min(maxDist, t1);
+                float actualPrimaryStepSize = (t1 - t0) / float(PRIMARY_STEP_COUNT);
+                float virtualPrimaryStepSize = actualPrimaryStepSize * planetScale;
+                float primaryStepPosition = 0.0;
+                float3 accumulatedRayleigh = float3(0.0, 0.0, 0.0);
+                float3 accumulatedMie = float3(0.0, 0.0, 0.0);
+                float3 opticalDepth = float3(0.0, 0.0, 0.0);
+                // Take N steps along primary ray
+                for (int i = 0; i < PRIMARY_STEP_COUNT; i++) {
+                float3 currentPrimarySamplePosition = rayOrigin + rayDirection * (
+                    primaryStepPosition + actualPrimaryStepSize * 0.5);
+                float currentHeight = max(0.0, length(currentPrimarySamplePosition) - planetRadius);
+                float currentOpticalDepthRayleigh = exp(-currentHeight / rayleighScale) * virtualPrimaryStepSize;
+                float currentOpticalDepthMie = exp(-currentHeight / mieScale) * virtualPrimaryStepSize;
+                // Taken from https://www.shadertoy.com/view/wlBXWK
+                float currentOpticalDepthOzone = (1.0 / cosh((absorptionHeightMax - currentHeight) / absorptionFalloff));
+                currentOpticalDepthOzone *= currentOpticalDepthRayleigh * virtualPrimaryStepSize;
+                opticalDepth += float3(currentOpticalDepthRayleigh, currentOpticalDepthMie, currentOpticalDepthOzone);
+                // Sample light ray and accumulate optical depth.
+                float3 opticalDepthLight = SampleLightRay(
+                    currentPrimarySamplePosition, sunDir,
+                    planetScale, planetRadius, totalRadius,
+                    rayleighScale, mieScale, absorptionHeightMax, absorptionFalloff);
+                float3 r = (
+                    betaRayleigh * (opticalDepth.x + opticalDepthLight.x) +
+                    betaMie * (opticalDepth.y + opticalDepthLight.y) + 
+                    betaAbsorption * (opticalDepth.z + opticalDepthLight.z));
+                float3 attn = exp(-r);
+                accumulatedRayleigh += currentOpticalDepthRayleigh * attn;
+                accumulatedMie += currentOpticalDepthMie * attn;
+                primaryStepPosition += actualPrimaryStepSize;
+                }
+                scatteringColour = sunIntensity * (phaseRayleigh * betaRayleigh * accumulatedRayleigh + phaseMie * betaMie * accumulatedMie);
+                scatteringOpacity = exp(
+                    -(betaMie * opticalDepth.y + betaRayleigh * opticalDepth.x + betaAbsorption * opticalDepth.z));
+            }
+
+
 
             float3 ApplyGroundFog(float3 color, float distToPoint, float height, float3 worldSpacePos, float3 rayOrigin,
                                   float3 rayDir, float3 sunDir)
@@ -225,7 +333,13 @@
                 direction = mul(CameraToWorld, float4(direction,0)).xyz;
                 direction = normalize(direction);  
 
-                float3 diff = ApplyFog(col, dist, height, i.worldPos, origin, direction, DirToSun);
+             //   float3 diff = ApplyFog(col, dist, height, i.worldPos, origin, direction, DirToSun);
+                float3 scatteringColor = float3(0,0,0);
+                float3 scatteringOpacity = float3(1,1,1);
+
+                _ComputeScattering(i.worldPos, direction, origin, DirToSun, scatteringColor, scatteringOpacity);
+
+                float3 diff = col.rgb * scatteringOpacity + scatteringColor;
 
                 return float4(diff.rgb, 1);
             }
