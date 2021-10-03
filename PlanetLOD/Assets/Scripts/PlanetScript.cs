@@ -58,6 +58,7 @@ public class PlanetScript : MonoBehaviour
             this.Construct();
             IsReady = true;
             CaptureCuboidHeightMap.IsReady = false;
+            Screen.SetResolution(1920, 1080, false);
         }
 
         if(IsReady == true)

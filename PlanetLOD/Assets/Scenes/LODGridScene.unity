@@ -578,11 +578,11 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: -1
+  m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_RenderingPath: -1
+  m_RenderingPath: 3
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
@@ -616,22 +616,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 1038627900}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 02fc97d3d4e1757459b32b1971c874c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 038e491ee422c7b488ceac0dad297638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SceneCamera: {fileID: 1038627902}
-  SunLight: {fileID: 852146220}
-  Planet: {fileID: 834735150}
-  PlanetRadius: 1024
-  AtmosphereRadius: 1090
-  InScatteringPoints: 10
-  OpticalDepthPoints: 10
-  DensityFallOff: 12
-  WaveLengths: {x: 700, y: 530, z: 440}
-  WaveLengthsColor: {r: 0, g: 0, b: 0, a: 0}
-  ScatteringStrength: 1
-  AtmosphereScale: 1
-  EffectMaterial: {fileID: 2100000, guid: bc97bc0c95ab4e64d833eeeb9d1a9bf5, type: 2}
+  downscale: 1
+  SCALE: 1
+  m_sun: {fileID: 852146219}
+  m_betaR: {x: 0.0058, y: 0.0135, z: 0.0331}
+  m_mieG: 0.75
+  m_sunIntensity: 10
+  m_writeData: {fileID: 7200000, guid: 5cdb2cc072e4642478a167d00a5cdeb2, type: 3}
+  EarthPosition: {x: 0, y: 0, z: 0}
+  RG: 1017.6
+  RT: 1127.2
+  RL: 1127.36
+  HR: 6
+  HM: 36
+  camera: {fileID: 0}
+  MinViewDistance: 100000
+  m_transmittance: {fileID: 0}
+  m_inscatter: {fileID: 0}
+  m_irradiance: {fileID: 0}
+  m_atmosphereImageEffect: {fileID: 2100000, guid: bc97bc0c95ab4e64d833eeeb9d1a9bf5,
+    type: 2}
 --- !u!1 &1095861030
 GameObject:
   m_ObjectHideFlags: 0
@@ -927,8 +934,8 @@ MonoBehaviour:
   RB: {fileID: 1729456178}
   MouseSensitivityX: 250
   MouseSensitivityY: 250
-  MoveSpeed: 100
-  JumpForce: 2200
+  MoveSpeed: 50
+  JumpForce: 6200
   GroundedMask:
     serializedVersion: 2
     m_Bits: 256

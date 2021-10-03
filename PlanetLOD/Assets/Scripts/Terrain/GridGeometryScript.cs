@@ -51,7 +51,7 @@ public class GridMeshScript
 
         float distToCenter = (sceneCamera.farClipPlane - sceneCamera.nearClipPlane) / 2.0f;
         Vector3 center = sceneCamera.transform.position + sceneCamera.transform.forward * distToCenter;
-        float extremeBound = 10000;
+        float extremeBound = 1000000;
         Mesh.bounds = new Bounds(center, Vector3.one * extremeBound);
 
         Mesh.vertices = VertexBuffer.ToArray();

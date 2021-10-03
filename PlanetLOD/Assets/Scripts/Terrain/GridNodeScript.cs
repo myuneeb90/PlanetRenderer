@@ -155,7 +155,7 @@ public class GridNodeScript
                             thisNode.Children[i].GridIndex = -1;
                         }
 
-                        thisNode.Children[i] = null;
+                   //     thisNode.Children[i] = null;
                     }
                 }
 
