@@ -127,6 +127,7 @@ public class GridNodeScript
                 if(thisNode.GridIndex != -1)
                 {
                     gridPool.Container[thisNode.GridIndex].State = GridGeometryStates.AVAILABLE;
+                //    gridPool.AvailableQueue.Enqueue(gridPool.Container[thisNode.GridIndex]);
                     thisNode.GridIndex = -1;
                 }
 
@@ -151,11 +152,12 @@ public class GridNodeScript
                     {
                         if(thisNode.Children[i].GridIndex != -1)
                         {
-                            gridPool.Container[thisNode.Children[i].GridIndex].State = GridGeometryStates.AVAILABLE;
+                           gridPool.Container[thisNode.Children[i].GridIndex].State = GridGeometryStates.AVAILABLE;
+                        //    gridPool.AvailableQueue.Enqueue(gridPool.Container[thisNode.Children[i].GridIndex]);
                             thisNode.Children[i].GridIndex = -1;
                         }
 
-                   //     thisNode.Children[i] = null;
+                        thisNode.Children[i] = null;
                     }
                 }
 
@@ -173,6 +175,8 @@ public class GridNodeScript
                             gridPool.Container[i].Divisions = divisions;
                             gridPool.Container[i].FaceType = faceType;
                             gridPool.Container[i].State = GridGeometryStates.INPROCESS;
+                            gridPool.ProcessQueue.Enqueue(gridPool.Container[i]);
+                            gridPool.ReadyList.Add(gridPool.Container[i]);
                             break;
                         }
                     }

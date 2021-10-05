@@ -58,6 +58,7 @@ public class PlanetScript : MonoBehaviour
             this.Construct();
             IsReady = true;
             CaptureCuboidHeightMap.IsReady = false;
+            BrushSpawner.gameObject.SetActive(false);
             Screen.SetResolution(1920, 1080, false);
         }
 
@@ -92,11 +93,16 @@ public class PlanetScript : MonoBehaviour
 
     void Render()
     {
+        if(GridPool != null)
+        {
+            GridPool.Render();
+        } 
+
         if(SceneCamera.transform.position != CameraPosition)
         {
             CameraPosition = SceneCamera.transform.position;
             IsCameraUpdated = true;
-            ProcessFrameCountOffset = 10;
+            ProcessFrameCountOffset = 1;
         }
         else
         {
@@ -128,7 +134,7 @@ public class PlanetScript : MonoBehaviour
             }
         }
 
-        GridPool.Render();        
+      
     }
 
     void ProcessThreadHandler()

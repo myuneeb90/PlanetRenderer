@@ -76,7 +76,7 @@ public class AtmosphericScatter : MonoBehaviour
 
 		m_irradiance = new RenderTexture(IRRADIANCE_WIDTH, IRRADIANCE_HEIGHT, 0, RenderTextureFormat.ARGBHalf)
 		{
-		wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, enableRandomWrite = true
+			wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, enableRandomWrite = true
 		};
 		m_irradiance.Create();
 	}
