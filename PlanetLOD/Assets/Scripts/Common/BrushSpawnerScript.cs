@@ -11,14 +11,6 @@ public class BrushSpawnerScript : MonoBehaviour
     public float SpawnRadius = 5.0f;
     public int BrushCount = 100;
 
-    // void Awake()
-    // {
-    //     if(Spawn == true)
-    //     {
-    //         SpawnBrushes();
-    //     }
-    // }
-
     public void SpawnBrushes()
     {
         BrushContainer = new List<GameObject>();
@@ -29,6 +21,9 @@ public class BrushSpawnerScript : MonoBehaviour
 			GameObject newBrush = (GameObject)Instantiate(BrushPrefabContainer[brushId], UnityEngine.Random.onUnitSphere * SpawnRadius, Quaternion.identity);
 			newBrush.transform.SetParent(this.transform);
 			newBrush.transform.LookAt(this.transform);
+            Vector3 rotation = newBrush.transform.localEulerAngles;
+            rotation.z = UnityEngine.Random.Range(0, 360);
+            newBrush.transform.localEulerAngles = rotation;
 
 			float scale = 0;
             
@@ -40,6 +35,11 @@ public class BrushSpawnerScript : MonoBehaviour
             if(brushId == 1)
             {
                 scale = UnityEngine.Random.Range(0.8f, 3.0f);
+            }
+            else
+            if(brushId == 2)
+            {
+                scale = UnityEngine.Random.Range(1.0f, 3.0f);
             }
 
 			newBrush.transform.localScale = new Vector3(scale, scale, -scale);

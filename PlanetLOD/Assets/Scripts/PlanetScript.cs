@@ -93,11 +93,6 @@ public class PlanetScript : MonoBehaviour
 
     void Render()
     {
-        if(GridPool != null)
-        {
-            GridPool.Render();
-        } 
-
         if(SceneCamera.transform.position != CameraPosition)
         {
             CameraPosition = SceneCamera.transform.position;
@@ -134,12 +129,15 @@ public class PlanetScript : MonoBehaviour
             }
         }
 
-      
+        if(GridPool != null)
+        {
+            GridPool.Render(Material);
+        }       
     }
 
     void ProcessThreadHandler()
     {
-        Debug.Log("Thread Executed Successfully!!!");
+   //     Debug.Log("Thread Executed Successfully!!!");
         if(IsProcessDone == false)
         {
             TopFace.Update(CameraPosition, Radius, GridPool);

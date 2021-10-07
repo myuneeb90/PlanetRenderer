@@ -2,46 +2,44 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// public class RenderableGridScript
+// {
+//     public int ID;
+// }
+
 public class GridPoolScript
 {
     public List<GridGeometryScript> Container;
+    public List<GridMeshScript> GridMeshContainer;
 
     public Queue<GridGeometryScript> PrepareQueue;
-    public Queue<GridGeometryScript> AvailableQueue;
     public Queue<GridGeometryScript> ProcessQueue;
 
-    public List<GridGeometryScript> ReadyList;
-    public List<GridGeometryScript> RenderList;
+    public List<int> ReadyList;
+    public List<int> RenderList;
+
     public int ProcessCount = 0;
 
     public GridPoolScript(int gridCount, float size, int divisions, Material material)
     {
         Container = new List<GridGeometryScript>();
+        GridMeshContainer = new List<GridMeshScript>();
 
         for(int i = 0; i < gridCount; i++)
         {
-            Container.Add(new GridGeometryScript(size, divisions, material));
+            Container.Add(new GridGeometryScript(size, divisions, material, i));
+            GridMeshScript gridMesh = new GridMeshScript();
+            GridMeshContainer.Add(gridMesh);
         }           
 
         PrepareQueue = new Queue<GridGeometryScript>();
-        AvailableQueue = new Queue<GridGeometryScript>();
         ProcessQueue = new Queue<GridGeometryScript>();
-        ReadyList = new List<GridGeometryScript>();
-        RenderList = new List<GridGeometryScript>();
+        ReadyList = new List<int>();
+        RenderList = new List<int>();
     }
 
     public void Process(float radius, CuboidHeightMapScript cuboidHM)
     {
-    //    Debug.Log("Process Count : " + ProcessCount);
-
-    //     while(AvailableQueue.Count != 0)
-    //     {
-    //         GridGeometryScript grid = AvailableQueue.Dequeue();
-        
-    //    //     Debug.Log("grid.State in Available Queue : " + grid.State);
-    //         grid.State = GridGeometryStates.AVAILABLE;
-    //     }
-
         while(ProcessQueue.Count != 0)
         {
             GridGeometryScript grid = ProcessQueue.Dequeue();
@@ -50,17 +48,30 @@ public class GridPoolScript
             ProcessCount++;
         }
 
-        // for(int i = 0; i < Container.Count; i++)
-        // {
-        //     if(Container[i].State == GridGeometryStates.INPROCESS)
-        //     {
-        //         Container[i].Process(radius, cuboidHM);
-        //         PrepareQueue.Enqueue(Container[i]);
-        //         ProcessCount++;
-        //     }
-        // }
+        if(PrepareQueue.Count > 0)
+        {
+            ReadyList.Clear();
+            for(int i = 0; i < Container.Count; i++)
+            {
+                if(Container[i].State == GridGeometryStates.RENDER ||
+                   Container[i].State == GridGeometryStates.ISREADY)
+                {
+                    ReadyList.Add(Container[i].ID);                 
+                }
+            }
+        }    
+    }
 
-        if(ReadyList.Count > 0)
+    public void Prepare(Camera sceneCamera)
+    {
+        int prepareCount = PrepareQueue.Count;
+        while(PrepareQueue.Count != 0)
+        {
+            GridGeometryScript grid = PrepareQueue.Dequeue();
+            grid.Prepare(sceneCamera, GridMeshContainer[grid.ID]);
+        }
+
+        if(prepareCount > 0)
         {
             RenderList.Clear();
             RenderList.AddRange(ReadyList);
@@ -68,55 +79,11 @@ public class GridPoolScript
         }
     }
 
-    public void Prepare(Camera sceneCamera)
-    {
-   //     Debug.Log("PrepareQueue.Count : " + PrepareQueue.Count);
-
-        while(PrepareQueue.Count != 0)
-        {
-            GridGeometryScript grid = PrepareQueue.Dequeue();
-            grid.Prepare(sceneCamera);
-        }
-
-    //    if(PrepareQueue.Count > 0)
-        // {
-        //     RenderList.Clear();
-        //     for(int i = 0; i < Container.Count; i++)
-        //     {
-        //         if(Container[i].State == GridGeometryStates.RENDER)
-        //         {
-        //             RenderList.Add(Container[i]);                 
-        //         }
-        //     }            
-        // }
-
-
-
-
-        // for(int i = 0; i < Container.Count; i++)
-        // {
-        //     if(Container[i].State == GridGeometryStates.ISREADY)
-        //     {
-        //         Container[i].Prepare(sceneCamera);
-        //     }
-        // } 
-    }
-
-    public void Render()
+    public void Render(Material gridMaterial)
     {
         for(int i = 0; i < RenderList.Count; i++)
         {
-         //   if(RenderList[i].State == GridGeometryStates.RENDER)
-            {
-                RenderList[i].Render();
-            }
+            GridMeshContainer[RenderList[i]].Render(gridMaterial);
         }
-        // for(int i = 0; i < Container.Count; i++)
-        // {
-        //     if(Container[i].State == GridGeometryStates.RENDER)
-        //     {
-        //         Container[i].Render();
-        //     }
-        // }
     }
 }

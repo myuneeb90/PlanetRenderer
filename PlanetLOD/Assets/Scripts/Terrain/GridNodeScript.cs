@@ -176,7 +176,7 @@ public class GridNodeScript
                             gridPool.Container[i].FaceType = faceType;
                             gridPool.Container[i].State = GridGeometryStates.INPROCESS;
                             gridPool.ProcessQueue.Enqueue(gridPool.Container[i]);
-                            gridPool.ReadyList.Add(gridPool.Container[i]);
+                            // gridPool.ReadyList.Add(gridPool.Container[i]);
                             break;
                         }
                     }
