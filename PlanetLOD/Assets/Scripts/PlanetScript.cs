@@ -29,7 +29,7 @@ public class PlanetScript : MonoBehaviour
     private Thread ProcessThread = null;
     private bool IsProcessDone;
     private Vector3 CameraPosition;
-    private bool IsCameraUpdated = false;
+  //  private bool IsCameraUpdated = false;
     private int ProcessFrameCountOffset;
 
     public CaptureCuboidHeightMapScript CaptureCuboidHeightMap;
@@ -96,12 +96,12 @@ public class PlanetScript : MonoBehaviour
         if(SceneCamera.transform.position != CameraPosition)
         {
             CameraPosition = SceneCamera.transform.position;
-            IsCameraUpdated = true;
+        //    IsCameraUpdated = true;
             ProcessFrameCountOffset = 1;
         }
         else
         {
-            IsCameraUpdated = false;
+        //    IsCameraUpdated = false;
             ProcessFrameCountOffset--;
 
             if(ProcessFrameCountOffset <= 0)
@@ -119,7 +119,7 @@ public class PlanetScript : MonoBehaviour
 
             if(ProcessThread == null && ProcessFrameCountOffset > 0)
             {
-                GridPool.Prepare(SceneCamera);
+                GridPool.Prepare(SceneCamera, Radius);
 
                 IsProcessDone = false;
 
@@ -131,7 +131,7 @@ public class PlanetScript : MonoBehaviour
 
         if(GridPool != null)
         {
-            GridPool.Render(Material);
+            GridPool.Render(Material, SceneCamera);
         }       
     }
 
