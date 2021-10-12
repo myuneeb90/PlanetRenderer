@@ -5,12 +5,12 @@ using UnityEngine;
 public enum GridFaceType
 {
     TOP = 0,
-    BOTTOM,
-    RIGHT,
-    LEFT,
-    FRONT,
-    BACK,
-    NONE
+    BOTTOM = 1,
+    RIGHT = 2,
+    LEFT = 3,
+    FRONT = 4,
+    BACK = 5,
+    NONE = 6
 };
 
 public enum GridGeometryStates
@@ -19,13 +19,13 @@ public enum GridGeometryStates
     INPROCESS = 1,
     ISREADY = 2,
     RENDER = 3
-}
+};
 
 public class GridMeshScript
 {
-
     public Mesh MeshObj;
     public Bounds BoundingBox;
+    public GridFaceType FaceType;
     private Vector3 v3FrontTopLeft;
     private Vector3 v3FrontTopRight;
     private Vector3 v3FrontBottomLeft;
@@ -86,8 +86,10 @@ public class GridMeshScript
 
     public void Prepare(Camera sceneCamera, Vector3[] vertexBuffer, Vector3[] normalBuffer, 
                         Vector2[] texcoordBuffer, Vector4[] tangentBuffer, int[] indexBuffer,
-                        Vector3 bbCenter, float size, float radius)
+                        Vector3 bbCenter, float size, float radius, GridFaceType faceType)
     {
+        FaceType = faceType;
+
         float distToCenter = (sceneCamera.farClipPlane - sceneCamera.nearClipPlane) / 2.0f;
         Vector3 center = sceneCamera.transform.position + sceneCamera.transform.forward * distToCenter;
         float extremeBound = 1000000;
@@ -116,7 +118,7 @@ public class GridMeshScript
 public class GridGeometryScript
 {
  //   public GridMeshScript GridMesh;
-    public Material GridMaterial;
+   // public Material GridMaterial;
     public GridFaceType FaceType;
     public Matrix4x4 FaceMatrix;
 
@@ -134,9 +136,9 @@ public class GridGeometryScript
     public Vector3 BBCenter;
     public int Divisions;
 
-    public GridGeometryScript(float size, int divisions, Material material, int id)
+    public GridGeometryScript(float size, int divisions, int id)
     {
-        GridMaterial = material;
+    //    GridMaterial = material;
         State = GridGeometryStates.AVAILABLE;
         ID = id;
 
@@ -187,7 +189,6 @@ public class GridGeometryScript
             }
         }  
     }
-
 
     public void Process(float radius, CuboidHeightMapScript cuboidHM)
     {
@@ -251,8 +252,8 @@ public class GridGeometryScript
                         vertex.z = vertex.z + edgeLength;
                     }
 
-                    if(Mathf.Approximately(Mathf.Abs(vertex.x), 1.0f) == true ||
-                       Mathf.Approximately(Mathf.Abs(vertex.z), 1.0f) == true)
+                    if(Mathf.Approximately(Mathf.Abs(vertex.x), 1.000000f) == true ||
+                       Mathf.Approximately(Mathf.Abs(vertex.z), 1.000000f) == true)
                     {
                         edgeVertex.x = vertex.x;
                         edgeVertex.z = vertex.z;
@@ -289,41 +290,42 @@ public class GridGeometryScript
                 
                 // GridMesh.NormalBuffer[idx] = Vector3.up;
                 TexcoordBuffer[idx] = new Vector2(uvh.x, uvh.y);
-                tileUVs[idx] = new Vector2(edgeLength + (float)x / (float)(Divisions), 
-                                           edgeLength + (float)z / (float)Divisions);
+                tileUVs[idx] = new Vector2((float)x / (float)(Divisions + 3), 
+                                           (float)z / (float)Divisions + 3);
                 // GridMesh.TangentBuffer[idx] = new Vector4();    
             }
         }
 
         // Calculate Normals
-        for(int i = 0; i < IndexBuffer.Length; i += 3)
-        {
-            int i0 = IndexBuffer[i];
-            int i1 = IndexBuffer[i + 1];
-            int i2 = IndexBuffer[i + 2];
+        // for(int i = 0; i < IndexBuffer.Length; i += 3)
+        // {
+        //     int i0 = IndexBuffer[i];
+        //     int i1 = IndexBuffer[i + 1];
+        //     int i2 = IndexBuffer[i + 2];
 
-            Vector3 v0 = edgeVertices[i0];
-            Vector3 v1 = edgeVertices[i1];
-            Vector3 v2 = edgeVertices[i2];
+        //     Vector3 v0 = edgeVertices[i0];
+        //     Vector3 v1 = edgeVertices[i1];
+        //     Vector3 v2 = edgeVertices[i2];
 
-            Vector3 u = v1 - v0;
-            Vector3 v = v2 - v0;
+        //     Vector3 u = v1 - v0;
+        //     Vector3 v = v2 - v0;
 
-            Vector3 n = Vector3.Cross(u, v);
+        //     Vector3 n = Vector3.Cross(u, v);
 
-            NormalBuffer[i0] += n;
-            NormalBuffer[i1] += n;
-            NormalBuffer[i2] += n;        
-        }
+        //     NormalBuffer[i0] += n;
+        //     NormalBuffer[i1] += n;
+        //     NormalBuffer[i2] += n;        
+        // }
 
-        for(int i = 0; i < NormalBuffer.Length; i++)
-        {
-            NormalBuffer[i] = NormalBuffer[i].normalized;
-        }
+        // for(int i = 0; i < NormalBuffer.Length; i++)
+        // {
+        //     NormalBuffer[i] = NormalBuffer[i].normalized;
+        // }
 
         // Calculate Tangents
         Vector3[] tan1 = new Vector3[VertexBuffer.Length];
         Vector3[] tan2 = new Vector3[VertexBuffer.Length];
+        Vector3[] norm = new Vector3[VertexBuffer.Length];
         Vector4[] tangents = new Vector4[VertexBuffer.Length];
 
         for(int a = 0; a < IndexBuffer.Length; a += 3)
@@ -363,6 +365,11 @@ public class GridGeometryScript
             tan2[i1] += tdir;
             tan2[i2] += tdir;
             tan2[i3] += tdir;
+
+            norm[i1] += Vector3.Cross(tan1[i1], tan2[i1]);
+            norm[i2] += Vector3.Cross(tan1[i2], tan2[i2]);
+            norm[i3] += Vector3.Cross(tan1[i3], tan2[i3]);
+
         }
 
         int vtxIdx = 0;
@@ -373,7 +380,7 @@ public class GridGeometryScript
             {
                 vtxIdx = x + z * (Divisions + divOffset);
 
-                Vector3 n = NormalBuffer[vtxIdx];
+                Vector3 n = norm[vtxIdx];
                 Vector3 t = tan1[vtxIdx];
                 Vector3.OrthoNormalize(ref n, ref t);
                 tangents[vtxIdx].x = t.x;
@@ -381,6 +388,7 @@ public class GridGeometryScript
                 tangents[vtxIdx].z = t.z;
                 tangents[vtxIdx].w = (Vector3.Dot(Vector3.Cross(n, t), tan2[vtxIdx]) < 0.0f) ? -1.0f : 1.0f;
                 TangentBuffer[vtxIdx] = tangents[vtxIdx];
+                NormalBuffer[vtxIdx] = Vector3.Cross(tan1[vtxIdx], tan2[vtxIdx]);//n.normalized;//norm[vtxIdx].normalized;
             }
         }
 
@@ -393,7 +401,7 @@ public class GridGeometryScript
     {
      //   GridMesh.Prepare(sceneCamera);
         gridMesh.Prepare(sceneCamera, VertexBuffer, NormalBuffer, TexcoordBuffer, TangentBuffer, IndexBuffer,
-                         this.BBCenter, this.Size, (radius / 1.45f));
+                         this.BBCenter, this.Size, (radius / 1.45f), FaceType);
         State = GridGeometryStates.RENDER;
     }
 

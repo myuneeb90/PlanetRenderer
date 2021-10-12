@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class CaptureCuboidHeightMapScript : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class CaptureCuboidHeightMapScript : MonoBehaviour
     public Texture2D LeftHM;
     public Texture2D FrontHM;
     public Texture2D BackHM;
+
+    public string TexturePath;
 
     public bool IsReady = false;
 
@@ -110,5 +113,20 @@ public class CaptureCuboidHeightMapScript : MonoBehaviour
 
             CameraContainer[i].gameObject.SetActive(false);             
         }
+
+        this.SaveTextureToFile(TopHM, "TopHM");
+        this.SaveTextureToFile(BottomHM, "BottomHM");
+        this.SaveTextureToFile(RightHM, "RightHM");
+        this.SaveTextureToFile(LeftHM, "LeftHM");
+        this.SaveTextureToFile(FrontHM, "FrontHM");
+        this.SaveTextureToFile(BackHM, "BackHM");
+
+//        TopHM.EncodeToPNG
+    }
+
+    private void SaveTextureToFile(Texture2D tex, string texName)
+    {
+        byte[] texBytes = tex.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + TexturePath + texName + ".png", texBytes);
     }
 }

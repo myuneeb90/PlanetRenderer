@@ -15,8 +15,14 @@ public class PlanetScript : MonoBehaviour
 
     public Camera SceneCamera;
 
-    public Material Material;
+    public Material TopMaterial;
+    public Material BottomMaterial;
+    public Material RightMaterial;
+    public Material LeftMaterial;
+    public Material FrontMaterial;
+    public Material BackMaterial;
 
+    public List<Texture2D> HeightMaps;
 
     public GridFaceScript TopFace;
     public GridFaceScript BottomFace;
@@ -29,57 +35,70 @@ public class PlanetScript : MonoBehaviour
     private Thread ProcessThread = null;
     private bool IsProcessDone;
     private Vector3 CameraPosition;
-  //  private bool IsCameraUpdated = false;
     private int ProcessFrameCountOffset;
 
-    public CaptureCuboidHeightMapScript CaptureCuboidHeightMap;
-    public BrushSpawnerScript BrushSpawner;
     private CuboidHeightMapScript CuboidHM;
 
     private bool IsReady = false;
 
+    private List<Material> GridMaterials;
+
 
     void Start()
     {
-        if(BrushSpawner.Spawn == true)
-        {
-            BrushSpawner.SpawnBrushes();
-            CaptureCuboidHeightMap.CaptureCubemap = true;
-        }
+        GridMaterials = new List<Material>();
+        GridMaterials.Add(TopMaterial);
+        GridMaterials.Add(BottomMaterial);
+        GridMaterials.Add(RightMaterial);
+        GridMaterials.Add(LeftMaterial);
+        GridMaterials.Add(FrontMaterial);
+        GridMaterials.Add(BackMaterial);
+
+        // if(BrushSpawner.Spawn == true)
+        // {
+        //     BrushSpawner.SpawnBrushes();
+        //     CaptureCuboidHeightMap.CaptureCubemap = true;
+        // }
+
+        CuboidHM = new CuboidHeightMapScript(HeightMaps[0], HeightMaps[1], HeightMaps[2], 
+                                             HeightMaps[3], HeightMaps[4], HeightMaps[5]);
+
+        this.Construct();
+
     }
 
     void Update()
     {
-        if(CaptureCuboidHeightMap.IsReady == true)
-        {
-            CuboidHM = new CuboidHeightMapScript(CaptureCuboidHeightMap.TopHM, CaptureCuboidHeightMap.BottomHM, 
-                                                 CaptureCuboidHeightMap.RightHM, CaptureCuboidHeightMap.LeftHM, 
-                                                 CaptureCuboidHeightMap.FrontHM, CaptureCuboidHeightMap.BackHM);
-            this.Construct();
-            IsReady = true;
-            CaptureCuboidHeightMap.IsReady = false;
-            BrushSpawner.gameObject.SetActive(false);
-            Screen.SetResolution(1920, 1080, false);
-        }
+        // if(CaptureCuboidHeightMap.IsReady == true)
+        // {
+        //     CuboidHM = new CuboidHeightMapScript(CaptureCuboidHeightMap.TopHM, CaptureCuboidHeightMap.BottomHM, 
+        //                                          CaptureCuboidHeightMap.RightHM, CaptureCuboidHeightMap.LeftHM, 
+        //                                          CaptureCuboidHeightMap.FrontHM, CaptureCuboidHeightMap.BackHM);
+        //     this.Construct();
+        //     IsReady = true;
+        //     CaptureCuboidHeightMap.IsReady = false;
+        //     BrushSpawner.gameObject.SetActive(false);
+        //     Screen.SetResolution(1920, 1080, false);
+        // }
 
-        if(IsReady == true)
-        {
+        // if(IsReady == true)
+        // {
             this.Render();
-        }
+//        }
     }
 
     void Construct()
     {
         Size = 2.0f;
 
-        GridPool = new GridPoolScript(GridPoolCount, Size, Divisions, Material);
+        GridPool = new GridPoolScript(GridPoolCount, Size, Divisions);
 
-        TopFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.TOP);
-        BottomFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.BOTTOM);
-        RightFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.RIGHT);
-        LeftFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.LEFT);
-        FrontFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.FRONT);
-        BackFace = new GridFaceScript(LODDepth, Size, Divisions, Material, GridFaceType.BACK);
+        TopFace = new GridFaceScript(LODDepth, Size, Divisions, TopMaterial, GridFaceType.TOP);
+        BottomFace = new GridFaceScript(LODDepth, Size, Divisions, BottomMaterial, GridFaceType.BOTTOM);
+        RightFace = new GridFaceScript(LODDepth, Size, Divisions, RightMaterial, GridFaceType.RIGHT);
+        LeftFace = new GridFaceScript(LODDepth, Size, Divisions, LeftMaterial, GridFaceType.LEFT);
+        FrontFace = new GridFaceScript(LODDepth, Size, Divisions, FrontMaterial, GridFaceType.FRONT);
+        BackFace = new GridFaceScript(LODDepth, Size, Divisions, BackMaterial, GridFaceType.BACK);
 
         Application.targetFrameRate = 60;
 
@@ -96,12 +115,10 @@ public class PlanetScript : MonoBehaviour
         if(SceneCamera.transform.position != CameraPosition)
         {
             CameraPosition = SceneCamera.transform.position;
-        //    IsCameraUpdated = true;
             ProcessFrameCountOffset = 1;
         }
         else
         {
-        //    IsCameraUpdated = false;
             ProcessFrameCountOffset--;
 
             if(ProcessFrameCountOffset <= 0)
@@ -131,7 +148,7 @@ public class PlanetScript : MonoBehaviour
 
         if(GridPool != null)
         {
-            GridPool.Render(Material, SceneCamera);
+            GridPool.Render(GridMaterials, SceneCamera);
         }       
     }
 

@@ -22,14 +22,14 @@ public class GridPoolScript
 
     public int ProcessCount = 0;
 
-    public GridPoolScript(int gridCount, float size, int divisions, Material material)
+    public GridPoolScript(int gridCount, float size, int divisions)
     {
         Container = new List<GridGeometryScript>();
         GridMeshContainer = new List<GridMeshScript>();
 
         for(int i = 0; i < gridCount; i++)
         {
-            Container.Add(new GridGeometryScript(size, divisions, material, i));
+            Container.Add(new GridGeometryScript(size, divisions, i));
             GridMeshScript gridMesh = new GridMeshScript();
             GridMeshContainer.Add(gridMesh);
         }           
@@ -81,7 +81,7 @@ public class GridPoolScript
         }
     }
 
-    public void Render(Material gridMaterial, Camera sceneCamera)
+    public void Render(List<Material> gridMaterials, Camera sceneCamera)
     {
         FrustumPlanes = GeometryUtility.CalculateFrustumPlanes(sceneCamera);
 
@@ -91,7 +91,7 @@ public class GridPoolScript
 
             if (GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
             {            
-                gridMesh.Render(gridMaterial);
+                gridMesh.Render(gridMaterials[(int)gridMesh.FaceType]);
             //    gridMesh.DrawBoundingBox(Color.green);
             }
         }

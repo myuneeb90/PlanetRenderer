@@ -11,6 +11,11 @@ public class BrushSpawnerScript : MonoBehaviour
     public float SpawnRadius = 5.0f;
     public int BrushCount = 100;
 
+    void Awake()
+    {
+        this.SpawnBrushes();
+    }
+
     public void SpawnBrushes()
     {
         BrushContainer = new List<GameObject>();
