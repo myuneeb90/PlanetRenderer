@@ -115,7 +115,7 @@ public class PlanetScript : MonoBehaviour
         if(SceneCamera.transform.position != CameraPosition)
         {
             CameraPosition = SceneCamera.transform.position;
-            ProcessFrameCountOffset = 1;
+            ProcessFrameCountOffset = 5;
         }
         else
         {

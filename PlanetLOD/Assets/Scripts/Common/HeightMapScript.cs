@@ -26,7 +26,12 @@ public class HeightMapScript
 
     public float GetHeightValue(int x, int y)
     {
+    //    Debug.Log("x : " + x + " , y : " + y);
     //    return Data[x % (Width - 1), y % (Height - 1)];
-        return Data[x, y];
+        int _x = Mathf.Abs(x);
+        int _y = Mathf.Abs(y);
+        
+        
+        return Data[_x % Width, _y % Height];
     }
 }

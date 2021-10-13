@@ -49,4 +49,25 @@ public class GridHelperScript
 
         return new Vector3(x, y, z);
     } 
+
+    public static Matrix4x4 GetJacobianMatrix(float height, float length, float u, float v)
+    {
+        float h = height;
+        float w = length;
+        float s = u;
+        float t = v;
+
+        Matrix4x4 mat = new Matrix4x4();
+
+        Vector3 ts = new Vector3(h / (w * (1 - (s * s) / (w * w))), -(s * t * h) / (w * w * w), -(s * h) / (w * w * w));
+        Vector3 tt = new Vector3(-(s * t * h) / (w * w * w), h / (w * (1 - (t * t) / (w * w))), -(t * h) / (w * w * w));
+        Vector3 th = new Vector3(s / w, t / w, 1 / w);
+
+        mat[0,0] = ts.x; mat[0,1] = ts.y; mat[0,2] = ts.z; mat[0,3] = 0; 
+        mat[1,0] = tt.x; mat[1,1] = tt.y; mat[1,2] = tt.z; mat[1,3] = 0; 
+        mat[2,0] = th.x; mat[2,1] = th.y; mat[2,2] = th.z; mat[2,3] = 0; 
+        mat[3,0] = 0;    mat[3,1] = 0;    mat[3,2] = 0;    mat[3,3] = 1; 
+
+        return mat;
+    }
 }

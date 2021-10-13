@@ -112,7 +112,17 @@ public class GridMeshScript
         {
             Graphics.DrawMesh(MeshObj, Matrix4x4.identity, gridMaterial, 0);
         }
+
+        // for(int i = 0; i < MeshObj.vertices.Length; i++)
+        // {
+        //     Debug.DrawRay(MeshObj.vertices[i], MeshObj.normals[i] * 10, Color.green);
+            
+        //     Vector3 tan = new Vector3(MeshObj.tangents[i].x, MeshObj.tangents[i].y, MeshObj.tangents[i].z);
+        //     Debug.DrawRay(MeshObj.vertices[i], tan * 10, Color.red);
+        // }
     }
+
+
 }
 
 public class GridGeometryScript
@@ -206,6 +216,8 @@ public class GridGeometryScript
         List<Vector2> tileUVs = new List<Vector2>();
         tileUVs.AddRange(TexcoordBuffer);
 
+        List<Matrix4x4> jacobianMatrices = new List<Matrix4x4>();
+
         for(int z = 0; z < Divisions + divOffset; z++)
         {
             for(int x = 0; x < Divisions + divOffset; x++)
@@ -261,8 +273,6 @@ public class GridGeometryScript
                     }
                 }
 
-
-
                 Vector3 cubePos = FaceMatrix.MultiplyVector(vertex);
                 Vector3 edgeCubePos = FaceMatrix.MultiplyVector(edgeVertex);
                 
@@ -292,7 +302,13 @@ public class GridGeometryScript
                 TexcoordBuffer[idx] = new Vector2(uvh.x, uvh.y);
                 tileUVs[idx] = new Vector2((float)x / (float)(Divisions + 3), 
                                            (float)z / (float)Divisions + 3);
+
+                float lenW = Mathf.Sqrt(uvh.x * uvh.x + uvh.y * uvh.y + 1);
+                float h = uvh.z;
+
+                Matrix4x4 jacobianMatrix = GridHelperScript.GetJacobianMatrix(h, lenW, uvh.x, uvh.y);
                 // GridMesh.TangentBuffer[idx] = new Vector4();    
+                jacobianMatrices.Add(jacobianMatrix);
             }
         }
 
@@ -323,74 +339,77 @@ public class GridGeometryScript
         // }
 
         // Calculate Tangents
-        Vector3[] tan1 = new Vector3[VertexBuffer.Length];
-        Vector3[] tan2 = new Vector3[VertexBuffer.Length];
-        Vector3[] norm = new Vector3[VertexBuffer.Length];
-        Vector4[] tangents = new Vector4[VertexBuffer.Length];
+        // Vector3[] tan1 = new Vector3[VertexBuffer.Length];
+        // Vector3[] tan2 = new Vector3[VertexBuffer.Length];
+        // Vector3[] norm = new Vector3[VertexBuffer.Length];
+        // Vector4[] tangents = new Vector4[VertexBuffer.Length];
 
-        for(int a = 0; a < IndexBuffer.Length; a += 3)
-        {
-            int i1 = IndexBuffer[a + 0];
-            int i2 = IndexBuffer[a + 1];
-            int i3 = IndexBuffer[a + 2];
+        // for(int a = 0; a < IndexBuffer.Length; a += 3)
+        // {
+        //     int i1 = IndexBuffer[a + 0];
+        //     int i2 = IndexBuffer[a + 1];
+        //     int i3 = IndexBuffer[a + 2];
 
-            Vector3 v1 = edgeVertices[i1];
-            Vector3 v2 = edgeVertices[i2];
-            Vector3 v3 = edgeVertices[i3];
+        //     Vector3 v1 = edgeVertices[i1];
+        //     Vector3 v2 = edgeVertices[i2];
+        //     Vector3 v3 = edgeVertices[i3];
 
-            Vector2 w1 = tileUVs[i1];
-            Vector2 w2 = tileUVs[i2];
-            Vector2 w3 = tileUVs[i3];
+        //     Vector2 w1 = tileUVs[i1];
+        //     Vector2 w2 = tileUVs[i2];
+        //     Vector2 w3 = tileUVs[i3];
 
-            float x1 = v2.x - v1.x;
-            float x2 = v3.x - v1.x;
-            float y1 = v2.y - v1.y;
-            float y2 = v3.y - v1.y;
-            float z1 = v2.z - v1.z;
-            float z2 = v3.z - v1.z;
+        //     float x1 = v2.x - v1.x;
+        //     float x2 = v3.x - v1.x;
+        //     float y1 = v2.y - v1.y;
+        //     float y2 = v3.y - v1.y;
+        //     float z1 = v2.z - v1.z;
+        //     float z2 = v3.z - v1.z;
 
-            float s1 = w2.x - w1.x;
-            float s2 = w3.x - w1.x;
-            float t1 = w2.y - w1.y;
-            float t2 = w3.y - w1.y;
+        //     float s1 = w2.x - w1.x;
+        //     float s2 = w3.x - w1.x;
+        //     float t1 = w2.y - w1.y;
+        //     float t2 = w3.y - w1.y;
 
-            float r = 1 / (s1 * t2 - s2 * t1);
-            Vector3 sdir = new Vector3((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
-            Vector3 tdir = new Vector3((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
+        //     float r = 1 / (s1 * t2 - s2 * t1);
+        //     Vector3 sdir = new Vector3((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+        //     Vector3 tdir = new Vector3((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
 
-            tan1[i1] += sdir;
-            tan1[i2] += sdir;
-            tan1[i3] += sdir;
+        //     tan1[i1] += sdir;
+        //     tan1[i2] += sdir;
+        //     tan1[i3] += sdir;
 
-            tan2[i1] += tdir;
-            tan2[i2] += tdir;
-            tan2[i3] += tdir;
+        //     tan2[i1] += tdir;
+        //     tan2[i2] += tdir;
+        //     tan2[i3] += tdir;
 
-            norm[i1] += Vector3.Cross(tan1[i1], tan2[i1]);
-            norm[i2] += Vector3.Cross(tan1[i2], tan2[i2]);
-            norm[i3] += Vector3.Cross(tan1[i3], tan2[i3]);
+        //     // norm[i1] += Vector3.Cross(tan1[i1], tan2[i1]);
+        //     // norm[i2] += Vector3.Cross(tan1[i2], tan2[i2]);
+        //     // norm[i3] += Vector3.Cross(tan1[i3], tan2[i3]);
 
-        }
+        // }
 
-        int vtxIdx = 0;
+        // int vtxIdx = 0;
 
-        for (int z = 0; z < Divisions + divOffset; z++)
-        {
-            for (int x = 0; x < Divisions + divOffset; x++)
-            {
-                vtxIdx = x + z * (Divisions + divOffset);
+        // for (int z = 0; z < Divisions + divOffset; z++)
+        // {
+        //     for (int x = 0; x < Divisions + divOffset; x++)
+        //     {
+        //         vtxIdx = x + z * (Divisions + divOffset);
 
-                Vector3 n = norm[vtxIdx];
-                Vector3 t = tan1[vtxIdx];
-                Vector3.OrthoNormalize(ref n, ref t);
-                tangents[vtxIdx].x = t.x;
-                tangents[vtxIdx].y = t.y;
-                tangents[vtxIdx].z = t.z;
-                tangents[vtxIdx].w = (Vector3.Dot(Vector3.Cross(n, t), tan2[vtxIdx]) < 0.0f) ? -1.0f : 1.0f;
-                TangentBuffer[vtxIdx] = tangents[vtxIdx];
-                NormalBuffer[vtxIdx] = Vector3.Cross(tan1[vtxIdx], tan2[vtxIdx]);//n.normalized;//norm[vtxIdx].normalized;
-            }
-        }
+        //         // Matrix4x4 jacobianMat = GridHelperScript.GetJacobianMatrix()
+
+        //         NormalBuffer[vtxIdx] = //norm[vtxIdx].normalized;
+        //         Vector3 n = NormalBuffer[vtxIdx];//norm[vtxIdx];
+        //         Vector3 t = tan1[vtxIdx];
+        //         Vector3.OrthoNormalize(ref n, ref t);
+        //         tangents[vtxIdx].x = t.x;
+        //         tangents[vtxIdx].y = t.y;
+        //         tangents[vtxIdx].z = t.z;
+        //         tangents[vtxIdx].w = (Vector3.Dot(Vector3.Cross(n, t), tan2[vtxIdx]) < 0.0f) ? -1.0f : 1.0f;
+        //         TangentBuffer[vtxIdx] = tangents[vtxIdx];
+        //     //    NormalBuffer[vtxIdx] = Vector3.Cross(tan1[vtxIdx], tan2[vtxIdx]);//n.normalized;//norm[vtxIdx].normalized;
+        //     }
+        // }
 
   //      gridMesh.Center = Center;
 
