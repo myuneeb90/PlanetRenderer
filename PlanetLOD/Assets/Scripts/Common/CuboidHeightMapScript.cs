@@ -50,19 +50,25 @@ public class CuboidHeightMapScript
 
     public int Tiling = 1;
     public float Height;
+    public float TileX;
+    public float TileY;
 
     public CuboidHeightMapScript(Texture2D top, Texture2D bottom, Texture2D right, 
                                  Texture2D left, Texture2D front, Texture2D back)
     {
-        Top = new HeightMapScript(top.width, top.height, top);
-        Bottom = new HeightMapScript(bottom.width, bottom.height, bottom);
-        Right = new HeightMapScript(right.width, right.height, right);
-        Left = new HeightMapScript(left.width, left.height, left);
-        Front = new HeightMapScript(front.width, front.height, front);
-        Back = new HeightMapScript(back.width, back.height, back); 
+        TileX = 1;
+        TileY = 1;
+
+        Top = new HeightMapScript(top.width, top.height, TileX, TileY, top);
+        Bottom = new HeightMapScript(bottom.width, bottom.height, TileX, TileY, bottom);
+        Right = new HeightMapScript(right.width, right.height, TileX, TileY, right);
+        Left = new HeightMapScript(left.width, left.height, TileX, TileY, left);
+        Front = new HeightMapScript(front.width, front.height, TileX, TileY, front);
+        Back = new HeightMapScript(back.width, back.height, TileX, TileY, back); 
 
         Tiling = 1;
-        Height = 0.025f;
+
+        Height = 0.03f;
     }
 
     public Vector3 GetCornerCoords(CuboidCornerType cornerType, float edgeLength, GridFaceType faceType = GridFaceType.NONE)
@@ -646,8 +652,8 @@ public class CuboidHeightMapScript
             face2 = Left;
         }
 
-        float h1 = face1.GetHeightValue((int)(uv1.x * face1.Width) * Tiling, (int)(uv1.y * face1.Height) * Tiling) * Height;
-        float h2 = face2.GetHeightValue((int)(uv2.x * face2.Width) * Tiling, (int)(uv2.y * face2.Height) * Tiling) * Height;
+        float h1 = face1.GetHeightValue(uv1.x, uv1.y) * Height;//face1.GetHeightValue((int)(uv1.x * face1.Width) * Tiling, (int)(uv1.y * face1.Height) * Tiling) * Height;
+        float h2 = face2.GetHeightValue(uv2.x, uv2.y) * Height;// face2.GetHeightValue((int)(uv2.x * face2.Width) * Tiling, (int)(uv2.y * face2.Height) * Tiling) * Height;
 
         height = (h1 + h2) / 2;
 
@@ -755,9 +761,9 @@ public class CuboidHeightMapScript
             face3 = Front;
         }                                                        
 
-        float h1 = face1.GetHeightValue((int)(uv1.x * face1.Width) * Tiling, (int)(uv1.y * face1.Height) * Tiling) * Height;
-        float h2 = face2.GetHeightValue((int)(uv2.x * face2.Width) * Tiling, (int)(uv2.y * face2.Height) * Tiling) * Height;
-        float h3 = face3.GetHeightValue((int)(uv3.x * face3.Width) * Tiling, (int)(uv3.y * face3.Height) * Tiling) * Height; 
+        float h1 = face1.GetHeightValue(uv1.x, uv1.y) * Height;//face1.GetHeightValue((int)(uv1.x * face1.Width) * Tiling, (int)(uv1.y * face1.Height) * Tiling) * Height;
+        float h2 = face2.GetHeightValue(uv2.x, uv2.y) * Height;//face2.GetHeightValue((int)(uv2.x * face2.Width) * Tiling, (int)(uv2.y * face2.Height) * Tiling) * Height;
+        float h3 = face3.GetHeightValue(uv3.x, uv3.y) * Height;//face3.GetHeightValue((int)(uv3.x * face3.Width) * Tiling, (int)(uv3.y * face3.Height) * Tiling) * Height; 
 
         height = (h1 + h2 + h3) / 3;
 
@@ -798,7 +804,8 @@ public class CuboidHeightMapScript
             selectedFace = Back;
         }
 
-        return selectedFace.GetHeightValue((int)(uv.x * selectedFace.Width) * Tiling, (int)(uv.y * selectedFace.Height) * Tiling) * Height;
+        return selectedFace.GetHeightValue(uv.x, uv.y) * Height;
+//        return selectedFace.GetHeightValue((int)(uv.x * selectedFace.Width) * Tiling, (int)(uv.y * selectedFace.Height) * Tiling) * Height;
     }
 
     public Vector2 GetFaceUV(Vector3 pos, GridFaceType faceType)
@@ -869,7 +876,7 @@ public class CuboidHeightMapScript
                     faceType = GridFaceType.LEFT;
                 }
             }
-
+            else
             if(absZ > absX && absZ > absY)
             {
                 if(pos.z > 0)
@@ -898,7 +905,7 @@ public class CuboidHeightMapScript
                     faceType = GridFaceType.BOTTOM;
                 }
             }
-        
+            else        
             if(absZ > absX && absZ > absY)
             {
                 if(pos.z > 0)
@@ -927,7 +934,7 @@ public class CuboidHeightMapScript
                     faceType = GridFaceType.BOTTOM;
                 }
             }
-
+            else
             if(absX > absY && absX > absZ)
             {
                 if(pos.x > 0)

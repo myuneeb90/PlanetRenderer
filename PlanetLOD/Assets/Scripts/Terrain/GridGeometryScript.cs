@@ -200,7 +200,12 @@ public class GridGeometryScript
         }  
     }
 
-    public void Process(float radius, CuboidHeightMapScript cuboidHM)
+    private bool FastApproximately(float a, float b, float threshold)
+    {
+        return ((a - b) < 0 ? ((a - b) * -1) : (a - b)) <= threshold;
+    }
+
+    public void Process(float radius, CuboidHeightMapScript cuboidHM, DebuggerScript debugger)
     {
         Vector3 orientationAngles = GridHelperScript.GetOrientationAngles(FaceType);
         FaceMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(orientationAngles), Vector3.one);
@@ -216,7 +221,11 @@ public class GridGeometryScript
         List<Vector2> tileUVs = new List<Vector2>();
         tileUVs.AddRange(TexcoordBuffer);
 
-        List<Matrix4x4> jacobianMatrices = new List<Matrix4x4>();
+   //     List<Matrix4x4> jacobianMatrices = new List<Matrix4x4>();
+
+     //   Center.y += 0.1f;
+
+  //      Debug.Log("Grid Face -------- " + FaceType);
 
         for(int z = 0; z < Divisions + divOffset; z++)
         {
@@ -264,23 +273,215 @@ public class GridGeometryScript
                         vertex.z = vertex.z + edgeLength;
                     }
 
-                    if(Mathf.Approximately(Mathf.Abs(vertex.x), 1.000000f) == true ||
-                       Mathf.Approximately(Mathf.Abs(vertex.z), 1.000000f) == true)
+                    if(Mathf.Approximately(Mathf.Abs(vertex.x), 1.0f) == true ||
+                       Mathf.Approximately(Mathf.Abs(vertex.z), 1.0f) == true)
                     {
                         edgeVertex.x = vertex.x;
                         edgeVertex.z = vertex.z;
                         edgeVertex.y = Center.y - edgeLength;
-                    }
+                    }                      
                 }
+
+                GridFaceType selectedFace = FaceType;
+                // float threshold = 0.0f;
+
+                
+                // if(FaceType == GridFaceType.TOP || FaceType == GridFaceType.BOTTOM)
+                // {
+                //     bool isOnXAxis = Mathf.Approximately(Mathf.Abs(edgeVertex.x), 1.0f);
+                //     bool isOnZAxis = Mathf.Approximately(Mathf.Abs(edgeVertex.z), 1.0f);
+
+                //     if(isOnXAxis == true && isOnZAxis == false)
+                //     {
+                //         if(edgeVertex.x > 0)
+                //         {
+                //             edgeVertex.x = 1.0f;
+                //             selectedFace = GridFaceType.RIGHT;
+                //         }
+                //         else
+                //         if(edgeVertex.x < 0)
+                //         {
+                //             edgeVertex.x = -1.0f;
+                //             selectedFace = GridFaceType.LEFT;
+                //         }
+                //     }
+                //     else
+                //     if(isOnXAxis == false && isOnZAxis == true)
+                //     {
+                //         if(edgeVertex.z > 0)
+                //         {
+                //             edgeVertex.z = 1;
+                //             selectedFace = GridFaceType.FRONT;
+                //         }
+                //         else
+                //         if(edgeVertex.z < 0)
+                //         {
+                //             edgeVertex.z = -1;
+                //             selectedFace = GridFaceType.BACK;
+                //         }
+                //     }
+                // }
+                // else
+                // if(FaceType == GridFaceType.RIGHT || FaceType == GridFaceType.LEFT)
+                // {
+                //     bool isOnXAxis = Mathf.Approximately(Mathf.Abs(edgeVertex.x), 1.0f);
+                //     bool isOnZAxis = Mathf.Approximately(Mathf.Abs(edgeVertex.z), 1.0f);
+
+                //     if(isOnXAxis == true && isOnZAxis == false)
+                //     {
+                //         if(edgeVertex.x > 0)
+                //         {
+                //             selectedFace = GridFaceType.BOTTOM;
+                //             edgeVertex.x = 1.0f;
+                //         }
+                //         else
+                //         if(edgeVertex.x < 0)
+                //         {
+                //             selectedFace = GridFaceType.TOP;
+                //             edgeVertex.x = -1.0f;
+                //         }
+                //     }
+                //     else
+                //     if(isOnXAxis == false && isOnZAxis == true)
+                //     {
+                //         if(edgeVertex.z > 0)
+                //         {
+                //             selectedFace = GridFaceType.FRONT;
+                //             edgeVertex.z = 1.0f;
+                //         }
+                //         else
+                //         if(edgeVertex.z < 0)
+                //         {
+                //             selectedFace = GridFaceType.BACK;
+                //             edgeVertex.z = -1.0f;
+                //         }
+                //     }
+                // }              
+
 
                 Vector3 cubePos = FaceMatrix.MultiplyVector(vertex);
                 Vector3 edgeCubePos = FaceMatrix.MultiplyVector(edgeVertex);
-                
+
+                // if(FaceType == GridFaceType.RIGHT)
+                // if(edgeCubePos.x < 0.5f)
+                // {
+                //     edgeCubePos.x = 0.5f; 
+                // }
+
+                edgeCubePos.x = Mathf.Round(edgeCubePos.x * 10000) * 0.0001f;
+                edgeCubePos.y = Mathf.Round(edgeCubePos.y * 10000) * 0.0001f;
+                edgeCubePos.z = Mathf.Round(edgeCubePos.z * 10000) * 0.0001f;
+
+                // if(FaceType == GridFaceType.TOP)
+                // {
+                //     if(x == Divisions + divOffsetMinusOne)
+                //     {
+                //         Debug.Log("edgeCubePos : " + edgeCubePos.ToString("F8"));
+                //     }
+                // }
+                // else
+                // if(FaceType == GridFaceType.RIGHT)
+                // {
+                //     if(x == 0)
+                //     {
+                //         bool isApprox = Mathf.Approximately(edgeCubePos.x, 1.0f); 
+
+                //         // if(isApprox == true)
+                //         // {
+                //         //     edgeCubePos.x = 1.0f;
+                //         // }
+                        
+
+                //         Debug.Log("edgeCubePos : " + edgeCubePos.ToString("F8") + " : isApprox x : 1 " + isApprox);
+                //     }
+                // }
+
+//                string edgeCubePosStr = edgeCubePos.ToString("F6");
+
+
+
                 Vector3 spherePos = GridHelperScript.GetCubeToSpherePosition(cubePos);
                 Vector3 edgeSpherePos = GridHelperScript.GetCubeToSpherePosition(edgeCubePos);
 
                 Vector3 uvh = cuboidHM.GetHeightValue(cubePos, FaceType, edgeLength);
-                Vector3 edgeUvh = cuboidHM.GetHeightValue(edgeCubePos, FaceType, edgeLength);
+                Vector3 edgeUvh = new Vector3();
+
+
+
+                edgeUvh = cuboidHM.GetHeightValue(edgeCubePos, selectedFace, edgeLength);
+
+
+                // if(x > 2 && z > 2 && x < Divisions + divOffsetMinusOne - 2 && z < Divisions + divOffsetMinusOne - 2)
+                // {
+
+                // }
+                // else
+                // {
+
+                    // edgeSpherePos.x = Mathf.Floor(edgeSpherePos.x);
+                    // edgeSpherePos.y = Mathf.Floor(edgeSpherePos.y);
+                    // edgeSpherePos.z = Mathf.Floor(edgeSpherePos.z);
+
+                    // if(FaceType == GridFaceType.TOP)
+                    // {
+                    //     if(x == Divisions + divOffsetMinusOne - 2)
+                    //     {
+                    //         Debug.Log("edgeSpherePos : " + edgeSpherePos.ToString("F4") + " : edgeCubePos : " + edgeCubePos.ToString("F8") + " : idx : " + idx + " : height : " + edgeUvh.z + " : edgeVertex : " + edgeVertex.ToString("F8"));
+                            
+                    //         Vector3 fval = edgeSpherePos * (1 + edgeUvh.z) * radius;
+
+                    //         fval.x = Mathf.Floor(fval.x);
+                    //         fval.y = Mathf.Floor(fval.y);
+                    //         fval.z = Mathf.Floor(fval.z);
+
+                    //         debugger.TopGridPositions.Add(fval);
+                    //     }
+                    // }
+                    // else
+                    // if(FaceType == GridFaceType.RIGHT)
+                    // {
+                    //     if(x == 0)
+                    //     {
+                    //         Debug.Log("edgeSpherePos : " + edgeSpherePos.ToString("F4") + " : edgeCubePos : " + edgeCubePos.ToString("F8") + " : idx : " + idx + " : height : " + edgeUvh.z + " : edgeVertex : " + edgeVertex.ToString("F8"));
+                    //         Vector3 fval = edgeSpherePos * (1 + edgeUvh.z) * radius;                            
+
+                    //         fval.x = Mathf.Floor(fval.x);
+                    //         fval.y = Mathf.Floor(fval.y);
+                    //         fval.z = Mathf.Floor(fval.z);
+
+                    //         debugger.RightGridPositions.Add(fval);
+                    //     }
+                    // }
+            //    }
+
+
+                // if(FaceType == GridFaceType.TOP)
+                // {
+                //     if(x == 0)
+                //     {
+                //         cuboidHM.GetHeightValue(edgeCubePos, GridFaceType.LEFT, edgeLength);
+                //     }
+
+                //     if(z == 0)
+                //     {
+                //         cuboidHM.GetHeightValue(edgeCubePos, GridFaceType.FRONT, edgeLength);
+                //     }
+
+                //     if(x == Divisions + divOffsetMinusOne)
+                //     {
+                //         cuboidHM.GetHeightValue(edgeCubePos, GridFaceType.RIGHT, edgeLength);
+                //     }
+
+                //     if(z == Divisions + divOffsetMinusOne)
+                //     {
+                //         cuboidHM.GetHeightValue(edgeCubePos, GridFaceType.BACK, edgeLength);
+                //     }
+                // }
+                
+                // if(x > 0 && z > 0 && x < Divisions + divOffsetMinusOne && z < Divisions + divOffsetMinusOne)
+                // {
+
+                // }
 
                 Vector3 finalSpherePos = new Vector3();
 
@@ -300,116 +501,116 @@ public class GridGeometryScript
                 
                 // GridMesh.NormalBuffer[idx] = Vector3.up;
                 TexcoordBuffer[idx] = new Vector2(uvh.x, uvh.y);
-                tileUVs[idx] = new Vector2((float)x / (float)(Divisions + 3), 
-                                           (float)z / (float)Divisions + 3);
+                tileUVs[idx] = new Vector2(edgeLength + (float)x / (float)(Divisions), 
+                                           edgeLength + (float)z / (float)Divisions);
 
-                float lenW = Mathf.Sqrt(uvh.x * uvh.x + uvh.y * uvh.y + 1);
-                float h = uvh.z;
+                // float lenW = Mathf.Sqrt(uvh.x * uvh.x + uvh.y * uvh.y + 1);
+                // float h = uvh.z;
 
-                Matrix4x4 jacobianMatrix = GridHelperScript.GetJacobianMatrix(h, lenW, uvh.x, uvh.y);
+            //    Matrix4x4 jacobianMatrix = GridHelperScript.GetJacobianMatrix(h, lenW, uvh.x, uvh.y);
                 // GridMesh.TangentBuffer[idx] = new Vector4();    
-                jacobianMatrices.Add(jacobianMatrix);
+            //    jacobianMatrices.Add(jacobianMatrix);
             }
         }
 
         // Calculate Normals
-        // for(int i = 0; i < IndexBuffer.Length; i += 3)
-        // {
-        //     int i0 = IndexBuffer[i];
-        //     int i1 = IndexBuffer[i + 1];
-        //     int i2 = IndexBuffer[i + 2];
+        for(int i = 0; i < IndexBuffer.Length; i += 3)
+        {
+            int i0 = IndexBuffer[i];
+            int i1 = IndexBuffer[i + 1];
+            int i2 = IndexBuffer[i + 2];
 
-        //     Vector3 v0 = edgeVertices[i0];
-        //     Vector3 v1 = edgeVertices[i1];
-        //     Vector3 v2 = edgeVertices[i2];
+            Vector3 v0 = edgeVertices[i0];
+            Vector3 v1 = edgeVertices[i1];
+            Vector3 v2 = edgeVertices[i2];
 
-        //     Vector3 u = v1 - v0;
-        //     Vector3 v = v2 - v0;
+            Vector3 u = v1 - v0;
+            Vector3 v = v2 - v0;
 
-        //     Vector3 n = Vector3.Cross(u, v);
+            Vector3 n = Vector3.Cross(u, v);
 
-        //     NormalBuffer[i0] += n;
-        //     NormalBuffer[i1] += n;
-        //     NormalBuffer[i2] += n;        
-        // }
+            NormalBuffer[i0] += n;
+            NormalBuffer[i1] += n;
+            NormalBuffer[i2] += n;        
+        }
 
-        // for(int i = 0; i < NormalBuffer.Length; i++)
-        // {
-        //     NormalBuffer[i] = NormalBuffer[i].normalized;
-        // }
+        for(int i = 0; i < NormalBuffer.Length; i++)
+        {
+            NormalBuffer[i] = NormalBuffer[i].normalized;
+        }
 
         // Calculate Tangents
-        // Vector3[] tan1 = new Vector3[VertexBuffer.Length];
-        // Vector3[] tan2 = new Vector3[VertexBuffer.Length];
-        // Vector3[] norm = new Vector3[VertexBuffer.Length];
-        // Vector4[] tangents = new Vector4[VertexBuffer.Length];
+        Vector3[] tan1 = new Vector3[VertexBuffer.Length];
+        Vector3[] tan2 = new Vector3[VertexBuffer.Length];
+        Vector3[] norm = new Vector3[VertexBuffer.Length];
+        Vector4[] tangents = new Vector4[VertexBuffer.Length];
 
-        // for(int a = 0; a < IndexBuffer.Length; a += 3)
-        // {
-        //     int i1 = IndexBuffer[a + 0];
-        //     int i2 = IndexBuffer[a + 1];
-        //     int i3 = IndexBuffer[a + 2];
+        for(int a = 0; a < IndexBuffer.Length; a += 3)
+        {
+            int i1 = IndexBuffer[a + 0];
+            int i2 = IndexBuffer[a + 1];
+            int i3 = IndexBuffer[a + 2];
 
-        //     Vector3 v1 = edgeVertices[i1];
-        //     Vector3 v2 = edgeVertices[i2];
-        //     Vector3 v3 = edgeVertices[i3];
+            Vector3 v1 = edgeVertices[i1];
+            Vector3 v2 = edgeVertices[i2];
+            Vector3 v3 = edgeVertices[i3];
 
-        //     Vector2 w1 = tileUVs[i1];
-        //     Vector2 w2 = tileUVs[i2];
-        //     Vector2 w3 = tileUVs[i3];
+            Vector2 w1 = TexcoordBuffer[i1];
+            Vector2 w2 = TexcoordBuffer[i2];
+            Vector2 w3 = TexcoordBuffer[i3];
 
-        //     float x1 = v2.x - v1.x;
-        //     float x2 = v3.x - v1.x;
-        //     float y1 = v2.y - v1.y;
-        //     float y2 = v3.y - v1.y;
-        //     float z1 = v2.z - v1.z;
-        //     float z2 = v3.z - v1.z;
+            float x1 = v2.x - v1.x;
+            float x2 = v3.x - v1.x;
+            float y1 = v2.y - v1.y;
+            float y2 = v3.y - v1.y;
+            float z1 = v2.z - v1.z;
+            float z2 = v3.z - v1.z;
 
-        //     float s1 = w2.x - w1.x;
-        //     float s2 = w3.x - w1.x;
-        //     float t1 = w2.y - w1.y;
-        //     float t2 = w3.y - w1.y;
+            float s1 = w2.x - w1.x;
+            float s2 = w3.x - w1.x;
+            float t1 = w2.y - w1.y;
+            float t2 = w3.y - w1.y;
 
-        //     float r = 1 / (s1 * t2 - s2 * t1);
-        //     Vector3 sdir = new Vector3((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
-        //     Vector3 tdir = new Vector3((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
+            float r = 1 / (s1 * t2 - s2 * t1);
+            Vector3 sdir = new Vector3((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+            Vector3 tdir = new Vector3((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
 
-        //     tan1[i1] += sdir;
-        //     tan1[i2] += sdir;
-        //     tan1[i3] += sdir;
+            tan1[i1] += sdir;
+            tan1[i2] += sdir;
+            tan1[i3] += sdir;
 
-        //     tan2[i1] += tdir;
-        //     tan2[i2] += tdir;
-        //     tan2[i3] += tdir;
+            tan2[i1] += tdir;
+            tan2[i2] += tdir;
+            tan2[i3] += tdir;
 
-        //     // norm[i1] += Vector3.Cross(tan1[i1], tan2[i1]);
-        //     // norm[i2] += Vector3.Cross(tan1[i2], tan2[i2]);
-        //     // norm[i3] += Vector3.Cross(tan1[i3], tan2[i3]);
+            norm[i1] += Vector3.Cross(tan1[i1], tan2[i1]);
+            norm[i2] += Vector3.Cross(tan1[i2], tan2[i2]);
+            norm[i3] += Vector3.Cross(tan1[i3], tan2[i3]);
 
-        // }
+        }
 
-        // int vtxIdx = 0;
+        int vtxIdx = 0;
 
-        // for (int z = 0; z < Divisions + divOffset; z++)
-        // {
-        //     for (int x = 0; x < Divisions + divOffset; x++)
-        //     {
-        //         vtxIdx = x + z * (Divisions + divOffset);
+        for (int z = 0; z < Divisions + divOffset; z++)
+        {
+            for (int x = 0; x < Divisions + divOffset; x++)
+            {
+                vtxIdx = x + z * (Divisions + divOffset);
 
-        //         // Matrix4x4 jacobianMat = GridHelperScript.GetJacobianMatrix()
+                // Matrix4x4 jacobianMat = GridHelperScript.GetJacobianMatrix()
 
-        //         NormalBuffer[vtxIdx] = //norm[vtxIdx].normalized;
-        //         Vector3 n = NormalBuffer[vtxIdx];//norm[vtxIdx];
-        //         Vector3 t = tan1[vtxIdx];
-        //         Vector3.OrthoNormalize(ref n, ref t);
-        //         tangents[vtxIdx].x = t.x;
-        //         tangents[vtxIdx].y = t.y;
-        //         tangents[vtxIdx].z = t.z;
-        //         tangents[vtxIdx].w = (Vector3.Dot(Vector3.Cross(n, t), tan2[vtxIdx]) < 0.0f) ? -1.0f : 1.0f;
-        //         TangentBuffer[vtxIdx] = tangents[vtxIdx];
-        //     //    NormalBuffer[vtxIdx] = Vector3.Cross(tan1[vtxIdx], tan2[vtxIdx]);//n.normalized;//norm[vtxIdx].normalized;
-        //     }
-        // }
+             //   NormalBuffer[vtxIdx] = norm[vtxIdx].normalized;
+                Vector3 n = NormalBuffer[vtxIdx];//norm[vtxIdx];
+                Vector3 t = tan1[vtxIdx];
+                Vector3.OrthoNormalize(ref n, ref t);
+                tangents[vtxIdx].x = t.x;
+                tangents[vtxIdx].y = t.y;
+                tangents[vtxIdx].z = t.z;
+                tangents[vtxIdx].w = (Vector3.Dot(Vector3.Cross(n, t), tan2[vtxIdx]) < 0.0f) ? -1.0f : 1.0f;
+                TangentBuffer[vtxIdx] = tangents[vtxIdx];
+            //    NormalBuffer[vtxIdx] = Vector3.Cross(tan1[vtxIdx], tan2[vtxIdx]);//n.normalized;//norm[vtxIdx].normalized;
+            }
+        }
 
   //      gridMesh.Center = Center;
 

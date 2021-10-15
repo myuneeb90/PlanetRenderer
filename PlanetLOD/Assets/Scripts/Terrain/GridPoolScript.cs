@@ -40,12 +40,12 @@ public class GridPoolScript
         RenderList = new List<int>();
     }
 
-    public void Process(float radius, CuboidHeightMapScript cuboidHM)
+    public void Process(float radius, CuboidHeightMapScript cuboidHM, DebuggerScript debugger)
     {
         while(ProcessQueue.Count != 0)
         {
             GridGeometryScript grid = ProcessQueue.Dequeue();
-            grid.Process(radius, cuboidHM);
+            grid.Process(radius, cuboidHM, debugger);
             PrepareQueue.Enqueue(grid);
             ProcessCount++;
         }
@@ -89,9 +89,9 @@ public class GridPoolScript
         {
             GridMeshScript gridMesh = GridMeshContainer[RenderList[i]];
 
-            if (GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
+         //   if (GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
             {            
-     //           if(gridMesh.FaceType == GridFaceType.TOP)// || gridMesh.FaceType == GridFaceType.RIGHT ||
+           //     if(gridMesh.FaceType == GridFaceType.TOP || gridMesh.FaceType == GridFaceType.RIGHT)// ||
 //                   gridMesh.FaceType == GridFaceType.BACK)
                 gridMesh.Render(gridMaterials[(int)gridMesh.FaceType]);
             //    gridMesh.DrawBoundingBox(Color.green);

@@ -39,9 +39,13 @@ public class PlanetScript : MonoBehaviour
 
     private CuboidHeightMapScript CuboidHM;
 
-    private bool IsReady = false;
+   // private bool IsReady = false;
 
     private List<Material> GridMaterials;
+
+    public DebuggerScript Debugger;
+
+    private bool FirstFrame = false;
 
 
     void Start()
@@ -54,37 +58,15 @@ public class PlanetScript : MonoBehaviour
         GridMaterials.Add(FrontMaterial);
         GridMaterials.Add(BackMaterial);
 
-        // if(BrushSpawner.Spawn == true)
-        // {
-        //     BrushSpawner.SpawnBrushes();
-        //     CaptureCuboidHeightMap.CaptureCubemap = true;
-        // }
-
         CuboidHM = new CuboidHeightMapScript(HeightMaps[0], HeightMaps[1], HeightMaps[2], 
                                              HeightMaps[3], HeightMaps[4], HeightMaps[5]);
 
         this.Construct();
-
     }
 
     void Update()
     {
-        // if(CaptureCuboidHeightMap.IsReady == true)
-        // {
-        //     CuboidHM = new CuboidHeightMapScript(CaptureCuboidHeightMap.TopHM, CaptureCuboidHeightMap.BottomHM, 
-        //                                          CaptureCuboidHeightMap.RightHM, CaptureCuboidHeightMap.LeftHM, 
-        //                                          CaptureCuboidHeightMap.FrontHM, CaptureCuboidHeightMap.BackHM);
-        //     this.Construct();
-        //     IsReady = true;
-        //     CaptureCuboidHeightMap.IsReady = false;
-        //     BrushSpawner.gameObject.SetActive(false);
-        //     Screen.SetResolution(1920, 1080, false);
-        // }
-
-        // if(IsReady == true)
-        // {
-            this.Render();
-//        }
+        this.Render();
     }
 
     void Construct()
@@ -115,7 +97,7 @@ public class PlanetScript : MonoBehaviour
         if(SceneCamera.transform.position != CameraPosition)
         {
             CameraPosition = SceneCamera.transform.position;
-            ProcessFrameCountOffset = 5;
+            ProcessFrameCountOffset = 10;
         }
         else
         {
@@ -124,6 +106,12 @@ public class PlanetScript : MonoBehaviour
             if(ProcessFrameCountOffset <= 0)
             {
                 ProcessFrameCountOffset = 0;
+
+                // if(FirstFrame == false)
+                // {
+                //     Debugger.Spawn();
+                //     FirstFrame = true;
+                // }
             }
         }
 
@@ -154,7 +142,6 @@ public class PlanetScript : MonoBehaviour
 
     void ProcessThreadHandler()
     {
-   //     Debug.Log("Thread Executed Successfully!!!");
         if(IsProcessDone == false)
         {
             TopFace.Update(CameraPosition, Radius, GridPool);
@@ -164,7 +151,7 @@ public class PlanetScript : MonoBehaviour
             FrontFace.Update(CameraPosition, Radius, GridPool);
             BackFace.Update(CameraPosition, Radius, GridPool);
 
-            GridPool.Process(Radius, CuboidHM);
+            GridPool.Process(Radius, CuboidHM, Debugger);
         }
 
         IsProcessDone = true;
