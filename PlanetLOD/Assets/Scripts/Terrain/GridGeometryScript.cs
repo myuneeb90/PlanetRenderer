@@ -177,27 +177,101 @@ public class GridGeometryScript
     public void ConstructIndexBuffer(int divisions, int divOffset, int divOffsetMinusOne)
     {
         int count = 0;
+
+
         for(int z = 0; z < divisions + divOffsetMinusOne; z++)
         {
             for(int x = 0; x < divisions + divOffsetMinusOne; x++)
             {
-                // Triangle 1
-                this.IndexBuffer[count] = (x + z * (divisions + divOffset));
-                count++;
-                this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset));
-                count++;
-                this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset));
-                count++;
+                if(FaceType == GridFaceType.FRONT || FaceType == GridFaceType.BACK)
+                {
+                    // Triangle 1
+                    this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
+                    count++;
+                    this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3  
+                    count++;
+                    this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                    count++;
 
-                // Triangle 2
-                this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset));
-                count++;
-                this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset));
-                count++;
-                this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset));                
-                count++;
+                    // Triangle 2
+                    this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
+                    count++;
+                    this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                    count++;
+                    this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3               
+                    count++;                    
+                }
+                else
+                {
+                    // Triangle 1
+                    this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
+                    count++;
+                    this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                    count++;
+                    this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                    count++;
+
+                    // Triangle 2
+                    this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                    count++;
+                    this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                    count++;
+                    this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3                
+                    count++;
+                }
             }
         }  
+    }
+
+    public void FixIndexBufferForFrontAndBackFaces(int divisions, int divOffset, int divOffsetMinusOne)
+    {
+        if(FaceType == GridFaceType.FRONT || FaceType == GridFaceType.BACK)
+        {
+            int count = 0;
+
+            for(int z = 0; z < divisions + divOffsetMinusOne; z++)
+            {
+                for(int x = 0; x < divisions + divOffsetMinusOne; x++)
+                {
+                    if(x == 0 || x == 1 || x == divisions + divOffsetMinusOne - 2 || x == divisions + divOffsetMinusOne - 1)
+                    {
+                        // Triangle 1
+                        this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
+                        count++;
+                        this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3  
+                        count++;
+                        this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                        count++;
+
+                        // Triangle 2
+                        this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
+                        count++;
+                        this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                        count++;
+                        this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3               
+                        count++;
+                    }
+                    else
+                    {
+                        // Triangle 1
+                        this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
+                        count++;
+                        this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                        count++;
+                        this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                        count++;
+
+                        // Triangle 2
+                        this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                        count++;
+                        this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                        count++;
+                        this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3                
+                        count++;                        
+                    }                    
+                }
+            }
+        }
     }
 
     private bool FastApproximately(float a, float b, float threshold)
@@ -222,8 +296,9 @@ public class GridGeometryScript
         tileUVs.AddRange(TexcoordBuffer);
 
    //     List<Matrix4x4> jacobianMatrices = new List<Matrix4x4>();
-
+   //     this.ConstructIndexBuffer(Divisions, divOffset, divOffsetMinusOne);
      //   Center.y += 0.1f;
+       this.FixIndexBufferForFrontAndBackFaces(Divisions, divOffset, divOffsetMinusOne);
 
   //      Debug.Log("Grid Face -------- " + FaceType);
 
@@ -241,7 +316,6 @@ public class GridGeometryScript
 
                 edgeVertex.x = vertex.x;
                 edgeVertex.z = vertex.z;
-
 
                 if(x > 0 && z > 0 && x < Divisions + divOffsetMinusOne && z < Divisions + divOffsetMinusOne)
                 {
@@ -496,7 +570,14 @@ public class GridGeometryScript
 
                 Vector3 finalEdgeSpherePos = edgeSpherePos * (1 + edgeUvh.z) * radius;
 
-                VertexBuffer[idx] = finalSpherePos;
+                // if(FaceType == GridFaceType.BACK)
+                // {
+                //     VertexBuffer[idx] = finalEdgeSpherePos;
+                // }
+                // else
+                {
+                    VertexBuffer[idx] = finalSpherePos;
+                }
                 edgeVertices[idx] = finalEdgeSpherePos;
                 
                 // GridMesh.NormalBuffer[idx] = Vector3.up;
@@ -542,7 +623,7 @@ public class GridGeometryScript
         // Calculate Tangents
         Vector3[] tan1 = new Vector3[VertexBuffer.Length];
         Vector3[] tan2 = new Vector3[VertexBuffer.Length];
-        Vector3[] norm = new Vector3[VertexBuffer.Length];
+   //     Vector3[] norm = new Vector3[VertexBuffer.Length];
         Vector4[] tangents = new Vector4[VertexBuffer.Length];
 
         for(int a = 0; a < IndexBuffer.Length; a += 3)
@@ -555,9 +636,9 @@ public class GridGeometryScript
             Vector3 v2 = edgeVertices[i2];
             Vector3 v3 = edgeVertices[i3];
 
-            Vector2 w1 = TexcoordBuffer[i1];
-            Vector2 w2 = TexcoordBuffer[i2];
-            Vector2 w3 = TexcoordBuffer[i3];
+            Vector2 w1 = tileUVs[i1];
+            Vector2 w2 = tileUVs[i2];
+            Vector2 w3 = tileUVs[i3];
 
             float x1 = v2.x - v1.x;
             float x2 = v3.x - v1.x;
@@ -583,9 +664,9 @@ public class GridGeometryScript
             tan2[i2] += tdir;
             tan2[i3] += tdir;
 
-            norm[i1] += Vector3.Cross(tan1[i1], tan2[i1]);
-            norm[i2] += Vector3.Cross(tan1[i2], tan2[i2]);
-            norm[i3] += Vector3.Cross(tan1[i3], tan2[i3]);
+            // norm[i1] += Vector3.Cross(tan1[i1], tan2[i1]);
+            // norm[i2] += Vector3.Cross(tan1[i2], tan2[i2]);
+            // norm[i3] += Vector3.Cross(tan1[i3], tan2[i3]);
 
         }
 
