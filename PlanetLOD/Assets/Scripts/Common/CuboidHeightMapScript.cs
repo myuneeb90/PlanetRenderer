@@ -68,7 +68,7 @@ public class CuboidHeightMapScript
 
         Tiling = 1;
 
-        Height = 0.03f;
+        Height = 0.02f;
     }
 
     public Vector3 GetCornerCoords(CuboidCornerType cornerType, float edgeLength, GridFaceType faceType = GridFaceType.NONE)

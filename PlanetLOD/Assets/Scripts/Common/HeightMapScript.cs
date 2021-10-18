@@ -62,31 +62,31 @@ public class HeightMapScript
 
     public float GetHeightValue(float x, float y)
     {
-        return Data[Mathf.Abs((int)(x * Width)) * (int)TileX % Width, Mathf.Abs((int)(y * Height)) * (int)TileY % Height];
+    //    return Data[Mathf.Abs((int)(x * Width)) * (int)TileX % Width, Mathf.Abs((int)(y * Height)) * (int)TileY % Height];
         // BiLinear Filtering
         
-    //     int offset = 1;
+        int offset = 1;
 
-    //     int ix = Mathf.Abs((int)(x * Width)) * (int)TileX;
-    //     int iy = Mathf.Abs((int)(y * Height)) * (int)TileY;
+        int ix = Mathf.Abs((int)(x * Width)) * (int)TileX;
+        int iy = Mathf.Abs((int)(y * Height)) * (int)TileY;
 
 
-    //     float h1 = Data[ix % Width,             iy % Height];
-    //     float h2 = Data[(ix + offset) % Width,  iy % Height];
-    //     float h3 = Data[ix % Width,            (iy + offset) % Height];
-    //     float h4 = Data[(ix + offset) % Width, (iy + offset) % Height];
+        float h1 = Data[ix % Width,             iy % Height];
+        float h2 = Data[(ix + offset) % Width,  iy % Height];
+        float h3 = Data[ix % Width,            (iy + offset) % Height];
+        float h4 = Data[(ix + offset) % Width, (iy + offset) % Height];
 
-    //     // float tx = x - Mathf.Floor(x);
-    //     // float ty = y - Mathf.Floor(y);
+        float tx = x * Width * TileX - Mathf.Floor(x * Width * TileX);
+        float ty = y * Height * TileY - Mathf.Floor(y * Height * TileY);
 
-    //  //   Debug.Log(tx + " : " + ty);
+     //   Debug.Log(tx + " : " + ty);
 
-    // //    float height1 = Data[Mathf.Abs((int)(x * Width)) * (int)TileX % Width, Mathf.Abs((int)(y * Height)) * (int)TileY % Height];
-    //     float height2 = this.GetBilinearValue(x, y, h1, h2, h3, h4);
+    //    float height1 = Data[Mathf.Abs((int)(x * Width)) * (int)TileX % Width, Mathf.Abs((int)(y * Height)) * (int)TileY % Height];
+        float height2 = this.GetBilinearValue(tx, ty, h1, h2, h3, h4);
 
-    // //    Debug.Log("height1 : " + height1 + " : height2 : " + height2);
+    //    Debug.Log("height1 : " + height1 + " : height2 : " + height2);
 
-    //     return height2;
+        return height2;
 
         // Bicubic Filtering
         // float _x = (Mathf.Abs(x) * Width) * TileX;

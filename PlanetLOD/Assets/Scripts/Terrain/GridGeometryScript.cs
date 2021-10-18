@@ -223,7 +223,7 @@ public class GridGeometryScript
         }  
     }
 
-    public void FixIndexBufferForFrontAndBackFaces(int divisions, int divOffset, int divOffsetMinusOne)
+    public void FixIndexBuffer(int divisions, int divOffset, int divOffsetMinusOne)
     {
         if(FaceType == GridFaceType.FRONT || FaceType == GridFaceType.BACK)
         {
@@ -272,6 +272,32 @@ public class GridGeometryScript
                 }
             }
         }
+        else
+        {
+            int count = 0;
+
+            for(int z = 0; z < divisions + divOffsetMinusOne; z++)
+            {
+                for(int x = 0; x < divisions + divOffsetMinusOne; x++)
+                {
+                    // Triangle 1
+                    this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
+                    count++;
+                    this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                    count++;
+                    this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                    count++;
+
+                    // Triangle 2
+                    this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                    count++;
+                    this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                    count++;
+                    this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3                
+                    count++;
+                }
+            }              
+        }
     }
 
     private bool FastApproximately(float a, float b, float threshold)
@@ -298,7 +324,7 @@ public class GridGeometryScript
    //     List<Matrix4x4> jacobianMatrices = new List<Matrix4x4>();
    //     this.ConstructIndexBuffer(Divisions, divOffset, divOffsetMinusOne);
      //   Center.y += 0.1f;
-       this.FixIndexBufferForFrontAndBackFaces(Divisions, divOffset, divOffsetMinusOne);
+       this.FixIndexBuffer(Divisions, divOffset, divOffsetMinusOne);
 
   //      Debug.Log("Grid Face -------- " + FaceType);
 

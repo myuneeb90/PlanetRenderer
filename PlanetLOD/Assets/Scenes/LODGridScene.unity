@@ -152,9 +152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7419aa1d5289bc74d830fa52ce1e77e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LODDepth: 1
+  LODDepth: 5
   Size: 2048
-  Divisions: 128
+  Divisions: 32
   GridPoolCount: 500
   Radius: 1024
   SceneCamera: {fileID: 1038627902}
@@ -197,7 +197,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1064
+  m_Radius: 1044
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &834735152
 MonoBehaviour:
@@ -396,7 +396,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038627900}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 038e491ee422c7b488ceac0dad297638, type: 3}
   m_Name: 
