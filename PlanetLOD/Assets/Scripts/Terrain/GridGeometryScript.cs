@@ -40,22 +40,33 @@ public class GridMeshScript
         MeshObj = new Mesh();
     }
 
-    public void ComputeBoundingBox()
+    public void ComputeBoundingBox(Vector3[] bbPositions)
     {
-        Bounds bounds = BoundingBox;
+        // Bounds bounds = BoundingBox;
                         
-        Vector3 v3Center = bounds.center;
-        Vector3 v3Extents = bounds.extents;
+        // Vector3 v3Center = bounds.center;
+        // Vector3 v3Extents = bounds.extents;
     
-        v3FrontTopLeft     = new Vector3(v3Center.x - v3Extents.x, v3Center.y + v3Extents.y, v3Center.z - v3Extents.z);  // Front top left corner
-        v3FrontTopRight    = new Vector3(v3Center.x + v3Extents.x, v3Center.y + v3Extents.y, v3Center.z - v3Extents.z);  // Front top right corner
-        v3FrontBottomLeft  = new Vector3(v3Center.x - v3Extents.x, v3Center.y - v3Extents.y, v3Center.z - v3Extents.z);  // Front bottom left corner
-        v3FrontBottomRight = new Vector3(v3Center.x + v3Extents.x, v3Center.y - v3Extents.y, v3Center.z - v3Extents.z);  // Front bottom right corner
-        v3BackTopLeft      = new Vector3(v3Center.x - v3Extents.x, v3Center.y + v3Extents.y, v3Center.z + v3Extents.z);  // Back top left corner
-        v3BackTopRight     = new Vector3(v3Center.x + v3Extents.x, v3Center.y + v3Extents.y, v3Center.z + v3Extents.z);  // Back top right corner
-        v3BackBottomLeft   = new Vector3(v3Center.x - v3Extents.x, v3Center.y - v3Extents.y, v3Center.z + v3Extents.z);  // Back bottom left corner
-        v3BackBottomRight  = new Vector3(v3Center.x + v3Extents.x, v3Center.y - v3Extents.y, v3Center.z + v3Extents.z);  // Back bottom right corner
-            
+        // v3FrontTopLeft     = new Vector3(v3Center.x - v3Extents.x, v3Center.y + v3Extents.y, v3Center.z - v3Extents.z);  // Front top left corner
+        // v3FrontTopRight    = new Vector3(v3Center.x + v3Extents.x, v3Center.y + v3Extents.y, v3Center.z - v3Extents.z);  // Front top right corner
+        // v3FrontBottomLeft  = new Vector3(v3Center.x - v3Extents.x, v3Center.y - v3Extents.y, v3Center.z - v3Extents.z);  // Front bottom left corner
+        // v3FrontBottomRight = new Vector3(v3Center.x + v3Extents.x, v3Center.y - v3Extents.y, v3Center.z - v3Extents.z);  // Front bottom right corner
+        // v3BackTopLeft      = new Vector3(v3Center.x - v3Extents.x, v3Center.y + v3Extents.y, v3Center.z + v3Extents.z);  // Back top left corner
+        // v3BackTopRight     = new Vector3(v3Center.x + v3Extents.x, v3Center.y + v3Extents.y, v3Center.z + v3Extents.z);  // Back top right corner
+        // v3BackBottomLeft   = new Vector3(v3Center.x - v3Extents.x, v3Center.y - v3Extents.y, v3Center.z + v3Extents.z);  // Back bottom left corner
+        // v3BackBottomRight  = new Vector3(v3Center.x + v3Extents.x, v3Center.y - v3Extents.y, v3Center.z + v3Extents.z);  // Back bottom right corner
+
+        v3FrontTopLeft     = bbPositions[0];
+        v3FrontTopRight    = bbPositions[1];
+        v3BackTopLeft      = bbPositions[2];
+        v3BackTopRight     = bbPositions[3];
+
+        v3FrontBottomLeft  = bbPositions[4];
+        v3FrontBottomRight = bbPositions[5];
+        v3BackBottomLeft   = bbPositions[6];
+        v3BackBottomRight  = bbPositions[7];
+
+
         // v3FrontTopLeft     = transform.TransformPoint(v3FrontTopLeft);
         // v3FrontTopRight    = transform.TransformPoint(v3FrontTopRight);
         // v3FrontBottomLeft  = transform.TransformPoint(v3FrontBottomLeft);
@@ -86,7 +97,8 @@ public class GridMeshScript
 
     public void Prepare(Camera sceneCamera, Vector3[] vertexBuffer, Vector3[] normalBuffer, 
                         Vector2[] texcoordBuffer, Vector4[] tangentBuffer, int[] indexBuffer,
-                        Vector3 bbCenter, float size, float radius, GridFaceType faceType)
+                        Vector3 bbCenter, float size, float radius, GridFaceType faceType,
+                        int divisions, int divOffset)
     {
         FaceType = faceType;
 
@@ -95,9 +107,38 @@ public class GridMeshScript
         float extremeBound = 1000000;
         MeshObj.bounds = new Bounds(center, Vector3.one * extremeBound);
 
-        BoundingBox = new Bounds(bbCenter, new Vector3(size * radius, size * radius, size * radius));
+        Vector3[] boundingPositions = new Vector3[8];
 
-    //    this.ComputeBoundingBox();
+        Vector3 yOffset = Vector3.up * 50;
+
+        int x = 0, z = 0;
+        boundingPositions[0] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TUL
+        x = divisions + divOffset - 1; z = 0;
+        boundingPositions[1] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TUR
+        x = 0; z = divisions + divOffset - 1;
+        boundingPositions[2] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TDL
+        x = divisions + divOffset - 1; z = divisions + divOffset - 1;
+        boundingPositions[3] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TDR
+
+        x = 0; z = 0;
+        boundingPositions[4] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BUL
+        x = divisions + divOffset - 1; z = 0;
+        boundingPositions[5] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BUR
+        x = 0; z = divisions + divOffset - 1;
+        boundingPositions[6] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BDL
+        x = divisions + divOffset - 1; z = divisions + divOffset - 1;
+        boundingPositions[7] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BDR
+
+
+
+        //GeometryUtility.CalculateBounds()
+    //    Transform transform = Matrix4x4.TRS();
+        x = (divisions + divOffset - 1) / 2; z = (divisions + divOffset - 1) / 2;
+        Matrix4x4 mat = Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(Vector3.forward, normalBuffer[x + z * (divisions + divOffset)]), Vector3.one);
+
+        BoundingBox = GeometryUtility.CalculateBounds(boundingPositions, mat); //new Bounds(bbCenter, new Vector3(size * radius, size * radius, size * radius));
+        BoundingBox.center = bbCenter;
+    //    this.ComputeBoundingBox(boundingPositions);
 
         MeshObj.vertices = vertexBuffer;
         MeshObj.normals = normalBuffer;
@@ -728,7 +769,7 @@ public class GridGeometryScript
     {
      //   GridMesh.Prepare(sceneCamera);
         gridMesh.Prepare(sceneCamera, VertexBuffer, NormalBuffer, TexcoordBuffer, TangentBuffer, IndexBuffer,
-                         this.BBCenter, this.Size, (radius / 1.45f), FaceType);
+                         this.BBCenter, this.Size, (radius / 1.45f), FaceType, this.Divisions, 3);
         State = GridGeometryStates.RENDER;
     }
 

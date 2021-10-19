@@ -89,12 +89,12 @@ public class GridPoolScript
         {
             GridMeshScript gridMesh = GridMeshContainer[RenderList[i]];
 
-         //   if (GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
+            if (GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
             {            
            //     if(gridMesh.FaceType == GridFaceType.TOP || gridMesh.FaceType == GridFaceType.RIGHT)// ||
 //                   gridMesh.FaceType == GridFaceType.BACK)
                 gridMesh.Render(gridMaterials[(int)gridMesh.FaceType]);
-            //    gridMesh.DrawBoundingBox(Color.green);
+          //      gridMesh.DrawBoundingBox(Color.green);
             }
         }
     }
