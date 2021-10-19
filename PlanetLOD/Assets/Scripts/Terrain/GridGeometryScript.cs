@@ -219,47 +219,25 @@ public class GridGeometryScript
     {
         int count = 0;
 
-
         for(int z = 0; z < divisions + divOffsetMinusOne; z++)
         {
             for(int x = 0; x < divisions + divOffsetMinusOne; x++)
             {
-                if(FaceType == GridFaceType.FRONT || FaceType == GridFaceType.BACK)
-                {
-                    // Triangle 1
-                    this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
-                    count++;
-                    this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3  
-                    count++;
-                    this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
-                    count++;
+                // Triangle 1
+                this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
+                count++;
+                this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                count++;
+                this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                count++;
 
-                    // Triangle 2
-                    this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
-                    count++;
-                    this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
-                    count++;
-                    this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3               
-                    count++;                    
-                }
-                else
-                {
-                    // Triangle 1
-                    this.IndexBuffer[count] = (x + z * (divisions + divOffset)); // v0
-                    count++;
-                    this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
-                    count++;
-                    this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
-                    count++;
-
-                    // Triangle 2
-                    this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
-                    count++;
-                    this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
-                    count++;
-                    this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3                
-                    count++;
-                }
+                // Triangle 2
+                this.IndexBuffer[count] = (x + (z + 1) * (divisions + divOffset)); // v2
+                count++;
+                this.IndexBuffer[count] = ((x + 1) + z * (divisions + divOffset)); // v1
+                count++;
+                this.IndexBuffer[count] = ((x + 1) + (z + 1) * (divisions + divOffset)); // v3                
+                count++;
             }
         }  
     }
@@ -362,9 +340,6 @@ public class GridGeometryScript
         List<Vector2> tileUVs = new List<Vector2>();
         tileUVs.AddRange(TexcoordBuffer);
 
-   //     List<Matrix4x4> jacobianMatrices = new List<Matrix4x4>();
-   //     this.ConstructIndexBuffer(Divisions, divOffset, divOffsetMinusOne);
-     //   Center.y += 0.1f;
        this.FixIndexBuffer(Divisions, divOffset, divOffsetMinusOne);
 
   //      Debug.Log("Grid Face -------- " + FaceType);
@@ -424,122 +399,13 @@ public class GridGeometryScript
                 }
 
                 GridFaceType selectedFace = FaceType;
-                // float threshold = 0.0f;
-
-                
-                // if(FaceType == GridFaceType.TOP || FaceType == GridFaceType.BOTTOM)
-                // {
-                //     bool isOnXAxis = Mathf.Approximately(Mathf.Abs(edgeVertex.x), 1.0f);
-                //     bool isOnZAxis = Mathf.Approximately(Mathf.Abs(edgeVertex.z), 1.0f);
-
-                //     if(isOnXAxis == true && isOnZAxis == false)
-                //     {
-                //         if(edgeVertex.x > 0)
-                //         {
-                //             edgeVertex.x = 1.0f;
-                //             selectedFace = GridFaceType.RIGHT;
-                //         }
-                //         else
-                //         if(edgeVertex.x < 0)
-                //         {
-                //             edgeVertex.x = -1.0f;
-                //             selectedFace = GridFaceType.LEFT;
-                //         }
-                //     }
-                //     else
-                //     if(isOnXAxis == false && isOnZAxis == true)
-                //     {
-                //         if(edgeVertex.z > 0)
-                //         {
-                //             edgeVertex.z = 1;
-                //             selectedFace = GridFaceType.FRONT;
-                //         }
-                //         else
-                //         if(edgeVertex.z < 0)
-                //         {
-                //             edgeVertex.z = -1;
-                //             selectedFace = GridFaceType.BACK;
-                //         }
-                //     }
-                // }
-                // else
-                // if(FaceType == GridFaceType.RIGHT || FaceType == GridFaceType.LEFT)
-                // {
-                //     bool isOnXAxis = Mathf.Approximately(Mathf.Abs(edgeVertex.x), 1.0f);
-                //     bool isOnZAxis = Mathf.Approximately(Mathf.Abs(edgeVertex.z), 1.0f);
-
-                //     if(isOnXAxis == true && isOnZAxis == false)
-                //     {
-                //         if(edgeVertex.x > 0)
-                //         {
-                //             selectedFace = GridFaceType.BOTTOM;
-                //             edgeVertex.x = 1.0f;
-                //         }
-                //         else
-                //         if(edgeVertex.x < 0)
-                //         {
-                //             selectedFace = GridFaceType.TOP;
-                //             edgeVertex.x = -1.0f;
-                //         }
-                //     }
-                //     else
-                //     if(isOnXAxis == false && isOnZAxis == true)
-                //     {
-                //         if(edgeVertex.z > 0)
-                //         {
-                //             selectedFace = GridFaceType.FRONT;
-                //             edgeVertex.z = 1.0f;
-                //         }
-                //         else
-                //         if(edgeVertex.z < 0)
-                //         {
-                //             selectedFace = GridFaceType.BACK;
-                //             edgeVertex.z = -1.0f;
-                //         }
-                //     }
-                // }              
-
 
                 Vector3 cubePos = FaceMatrix.MultiplyVector(vertex);
                 Vector3 edgeCubePos = FaceMatrix.MultiplyVector(edgeVertex);
 
-                // if(FaceType == GridFaceType.RIGHT)
-                // if(edgeCubePos.x < 0.5f)
-                // {
-                //     edgeCubePos.x = 0.5f; 
-                // }
-
                 edgeCubePos.x = Mathf.Round(edgeCubePos.x * 10000) * 0.0001f;
                 edgeCubePos.y = Mathf.Round(edgeCubePos.y * 10000) * 0.0001f;
                 edgeCubePos.z = Mathf.Round(edgeCubePos.z * 10000) * 0.0001f;
-
-                // if(FaceType == GridFaceType.TOP)
-                // {
-                //     if(x == Divisions + divOffsetMinusOne)
-                //     {
-                //         Debug.Log("edgeCubePos : " + edgeCubePos.ToString("F8"));
-                //     }
-                // }
-                // else
-                // if(FaceType == GridFaceType.RIGHT)
-                // {
-                //     if(x == 0)
-                //     {
-                //         bool isApprox = Mathf.Approximately(edgeCubePos.x, 1.0f); 
-
-                //         // if(isApprox == true)
-                //         // {
-                //         //     edgeCubePos.x = 1.0f;
-                //         // }
-                        
-
-                //         Debug.Log("edgeCubePos : " + edgeCubePos.ToString("F8") + " : isApprox x : 1 " + isApprox);
-                //     }
-                // }
-
-//                string edgeCubePosStr = edgeCubePos.ToString("F6");
-
-
 
                 Vector3 spherePos = GridHelperScript.GetCubeToSpherePosition(cubePos);
                 Vector3 edgeSpherePos = GridHelperScript.GetCubeToSpherePosition(edgeCubePos);
@@ -547,82 +413,7 @@ public class GridGeometryScript
                 Vector3 uvh = cuboidHM.GetHeightValue(cubePos, FaceType, edgeLength);
                 Vector3 edgeUvh = new Vector3();
 
-
-
                 edgeUvh = cuboidHM.GetHeightValue(edgeCubePos, selectedFace, edgeLength);
-
-
-                // if(x > 2 && z > 2 && x < Divisions + divOffsetMinusOne - 2 && z < Divisions + divOffsetMinusOne - 2)
-                // {
-
-                // }
-                // else
-                // {
-
-                    // edgeSpherePos.x = Mathf.Floor(edgeSpherePos.x);
-                    // edgeSpherePos.y = Mathf.Floor(edgeSpherePos.y);
-                    // edgeSpherePos.z = Mathf.Floor(edgeSpherePos.z);
-
-                    // if(FaceType == GridFaceType.TOP)
-                    // {
-                    //     if(x == Divisions + divOffsetMinusOne - 2)
-                    //     {
-                    //         Debug.Log("edgeSpherePos : " + edgeSpherePos.ToString("F4") + " : edgeCubePos : " + edgeCubePos.ToString("F8") + " : idx : " + idx + " : height : " + edgeUvh.z + " : edgeVertex : " + edgeVertex.ToString("F8"));
-                            
-                    //         Vector3 fval = edgeSpherePos * (1 + edgeUvh.z) * radius;
-
-                    //         fval.x = Mathf.Floor(fval.x);
-                    //         fval.y = Mathf.Floor(fval.y);
-                    //         fval.z = Mathf.Floor(fval.z);
-
-                    //         debugger.TopGridPositions.Add(fval);
-                    //     }
-                    // }
-                    // else
-                    // if(FaceType == GridFaceType.RIGHT)
-                    // {
-                    //     if(x == 0)
-                    //     {
-                    //         Debug.Log("edgeSpherePos : " + edgeSpherePos.ToString("F4") + " : edgeCubePos : " + edgeCubePos.ToString("F8") + " : idx : " + idx + " : height : " + edgeUvh.z + " : edgeVertex : " + edgeVertex.ToString("F8"));
-                    //         Vector3 fval = edgeSpherePos * (1 + edgeUvh.z) * radius;                            
-
-                    //         fval.x = Mathf.Floor(fval.x);
-                    //         fval.y = Mathf.Floor(fval.y);
-                    //         fval.z = Mathf.Floor(fval.z);
-
-                    //         debugger.RightGridPositions.Add(fval);
-                    //     }
-                    // }
-            //    }
-
-
-                // if(FaceType == GridFaceType.TOP)
-                // {
-                //     if(x == 0)
-                //     {
-                //         cuboidHM.GetHeightValue(edgeCubePos, GridFaceType.LEFT, edgeLength);
-                //     }
-
-                //     if(z == 0)
-                //     {
-                //         cuboidHM.GetHeightValue(edgeCubePos, GridFaceType.FRONT, edgeLength);
-                //     }
-
-                //     if(x == Divisions + divOffsetMinusOne)
-                //     {
-                //         cuboidHM.GetHeightValue(edgeCubePos, GridFaceType.RIGHT, edgeLength);
-                //     }
-
-                //     if(z == Divisions + divOffsetMinusOne)
-                //     {
-                //         cuboidHM.GetHeightValue(edgeCubePos, GridFaceType.BACK, edgeLength);
-                //     }
-                // }
-                
-                // if(x > 0 && z > 0 && x < Divisions + divOffsetMinusOne && z < Divisions + divOffsetMinusOne)
-                // {
-
-                // }
 
                 Vector3 finalSpherePos = new Vector3();
 
@@ -637,27 +428,12 @@ public class GridGeometryScript
 
                 Vector3 finalEdgeSpherePos = edgeSpherePos * (1 + edgeUvh.z) * radius;
 
-                // if(FaceType == GridFaceType.BACK)
-                // {
-                //     VertexBuffer[idx] = finalEdgeSpherePos;
-                // }
-                // else
-                {
-                    VertexBuffer[idx] = finalSpherePos;
-                }
+                VertexBuffer[idx] = finalSpherePos;
                 edgeVertices[idx] = finalEdgeSpherePos;
                 
-                // GridMesh.NormalBuffer[idx] = Vector3.up;
                 TexcoordBuffer[idx] = new Vector2(uvh.x, uvh.y);
                 tileUVs[idx] = new Vector2(edgeLength + (float)x / (float)(Divisions), 
                                            edgeLength + (float)z / (float)Divisions);
-
-                // float lenW = Mathf.Sqrt(uvh.x * uvh.x + uvh.y * uvh.y + 1);
-                // float h = uvh.z;
-
-            //    Matrix4x4 jacobianMatrix = GridHelperScript.GetJacobianMatrix(h, lenW, uvh.x, uvh.y);
-                // GridMesh.TangentBuffer[idx] = new Vector4();    
-            //    jacobianMatrices.Add(jacobianMatrix);
             }
         }
 
@@ -690,7 +466,6 @@ public class GridGeometryScript
         // Calculate Tangents
         Vector3[] tan1 = new Vector3[VertexBuffer.Length];
         Vector3[] tan2 = new Vector3[VertexBuffer.Length];
-   //     Vector3[] norm = new Vector3[VertexBuffer.Length];
         Vector4[] tangents = new Vector4[VertexBuffer.Length];
 
         for(int a = 0; a < IndexBuffer.Length; a += 3)
@@ -730,11 +505,6 @@ public class GridGeometryScript
             tan2[i1] += tdir;
             tan2[i2] += tdir;
             tan2[i3] += tdir;
-
-            // norm[i1] += Vector3.Cross(tan1[i1], tan2[i1]);
-            // norm[i2] += Vector3.Cross(tan1[i2], tan2[i2]);
-            // norm[i3] += Vector3.Cross(tan1[i3], tan2[i3]);
-
         }
 
         int vtxIdx = 0;
@@ -745,10 +515,7 @@ public class GridGeometryScript
             {
                 vtxIdx = x + z * (Divisions + divOffset);
 
-                // Matrix4x4 jacobianMat = GridHelperScript.GetJacobianMatrix()
-
-             //   NormalBuffer[vtxIdx] = norm[vtxIdx].normalized;
-                Vector3 n = NormalBuffer[vtxIdx];//norm[vtxIdx];
+                Vector3 n = NormalBuffer[vtxIdx];
                 Vector3 t = tan1[vtxIdx];
                 Vector3.OrthoNormalize(ref n, ref t);
                 tangents[vtxIdx].x = t.x;
@@ -756,27 +523,16 @@ public class GridGeometryScript
                 tangents[vtxIdx].z = t.z;
                 tangents[vtxIdx].w = (Vector3.Dot(Vector3.Cross(n, t), tan2[vtxIdx]) < 0.0f) ? -1.0f : 1.0f;
                 TangentBuffer[vtxIdx] = tangents[vtxIdx];
-            //    NormalBuffer[vtxIdx] = Vector3.Cross(tan1[vtxIdx], tan2[vtxIdx]);//n.normalized;//norm[vtxIdx].normalized;
             }
         }
-
-  //      gridMesh.Center = Center;
 
         State = GridGeometryStates.ISREADY;
     }
 
     public void Prepare(Camera sceneCamera, GridMeshScript gridMesh, float radius)
     {
-     //   GridMesh.Prepare(sceneCamera);
         gridMesh.Prepare(sceneCamera, VertexBuffer, NormalBuffer, TexcoordBuffer, TangentBuffer, IndexBuffer,
                          this.BBCenter, this.Size, (radius / 1.45f), FaceType, this.Divisions, 3);
         State = GridGeometryStates.RENDER;
-    }
-
-    public void Render()
-    {
-     //   Graphics.DrawMesh(GridMesh.Mesh, Matrix4x4.identity, GridMaterial, 0);
-    }
-
-    
+    }    
 }

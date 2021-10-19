@@ -37,6 +37,9 @@ public class PlanetScript : MonoBehaviour
     private Vector3 CameraPosition;
     private int ProcessFrameCountOffset;
 
+    public Transform Player;
+    public Transform PlayerCollider;
+
     private CuboidHeightMapScript CuboidHM;
 
    // private bool IsReady = false;
@@ -45,7 +48,7 @@ public class PlanetScript : MonoBehaviour
 
     public DebuggerScript Debugger;
 
-    private bool FirstFrame = false;
+   // private bool FirstFrame = false;
 
 
     void Start()
@@ -65,7 +68,22 @@ public class PlanetScript : MonoBehaviour
     }
 
     void Update()
-    {
+    {        
+        Vector3 playerPosition = Player.position.normalized;
+
+        Vector3 uvh = CuboidHM.GetHeightValue(GridHelperScript.GetSphereToCubePosition(playerPosition), GridFaceType.TOP, 0.1f / (float)Divisions);
+
+        PlayerCollider.position = playerPosition * (1 + uvh.z) * (Radius - 1);
+        PlayerCollider.up = playerPosition;
+
+        float d1 = Vector3.Distance(Player.position, Vector3.zero);
+        float d2 = Vector3.Distance(PlayerCollider.position, Vector3.zero);
+
+        if(d1 < d2)
+        {
+            Player.position = playerPosition * (1 + uvh.z) * (Radius + 1);
+        }
+        
         this.Render();
     }
 
@@ -106,12 +124,6 @@ public class PlanetScript : MonoBehaviour
             if(ProcessFrameCountOffset <= 0)
             {
                 ProcessFrameCountOffset = 0;
-
-                // if(FirstFrame == false)
-                // {
-                //     Debugger.Spawn();
-                //     FirstFrame = true;
-                // }
             }
         }
 

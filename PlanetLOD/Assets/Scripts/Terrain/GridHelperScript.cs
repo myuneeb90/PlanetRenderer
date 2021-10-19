@@ -50,6 +50,193 @@ public class GridHelperScript
         return new Vector3(x, y, z);
     } 
 
+    public static Vector3 GetSphereToCubePosition(Vector3 v)
+    {
+        float x, y, z;
+        x = v.x;
+        y = v.y;
+        z = v.z;
+
+        float fx, fy, fz;
+        fx = Mathf.Abs(x);
+        fy = Mathf.Abs(y);
+        fz = Mathf.Abs(z);
+
+        const float inverseSqrt2 = 0.70710676908493042f;
+
+        if (fy >= fx && fy >= fz)
+        {
+            float a2 = x * x * 2.0f;
+            float b2 = z * z * 2.0f;
+            float inner = -a2 + b2 - 3;
+            float innerSqrt = -Mathf.Sqrt((inner * inner) - 12.0f * a2);
+
+            if (x == 0.0f || x == -0.0f)
+            {
+                v = new Vector3(0.0f, v.y, v.z);
+            }
+            else
+            {
+                v = new Vector3(Mathf.Sqrt(innerSqrt + a2 - b2 + 3.0f) * inverseSqrt2, v.y, v.z);
+            }
+
+            if (z == 0.0f || z == -0.0f)
+            {
+                v = new Vector3(v.x, v.y, 0.0f);
+            }
+            else
+            {
+                v = new Vector3(v.x, v.y, Mathf.Sqrt(innerSqrt - a2 + b2 + 3.0f) * inverseSqrt2);
+            }
+
+            if (v.x > 1.0f)
+            {
+                v = new Vector3(1.0f, v.y, v.z);
+            }
+
+            if (v.z > 1.0f)
+            {
+                v = new Vector3(v.x, v.y, 1.0f);
+            }
+
+            if (x < 0)
+            {
+                v = new Vector3(-v.x, v.y, v.z);
+            }
+
+            if (z < 0)
+            {
+                v = new Vector3(v.x, v.y, -v.z);
+            }
+
+            if (y > 0)
+            {
+                // Top Face
+                v = new Vector3(v.x, 1.0f, v.z);
+            }
+            else
+            {
+                // Bottom Face
+                v = new Vector3(v.x, -1.0f, v.z);
+            }
+        }
+        else 
+        if (fx >= fy && fx >= fz)
+        {
+            float a2 = y * y * 2.0f;
+            float b2 = z * z * 2.0f;
+            float inner = -a2 + b2 - 3;
+            float innerSqrt = -Mathf.Sqrt((inner * inner) - 12.0f * a2);
+
+            if (y == 0.0f || y == -0.0f)
+            { 
+                v = new Vector3(v.x, 0.0f, v.z);
+            }
+            else
+            {
+                v = new Vector3(v.x, Mathf.Sqrt(innerSqrt + a2 - b2 + 3.0f) * inverseSqrt2, v.z);
+            }
+
+            if (z == 0.0f || z == -0.0f)
+            {
+                v = new Vector3(v.x, v.y, 0.0f);
+            }
+            else
+            {
+                v = new Vector3(v.x, v.y, Mathf.Sqrt(innerSqrt - a2 + b2 + 3.0f) * inverseSqrt2);
+            }
+
+            if (v.y > 1.0f)
+            {
+                v = new Vector3(v.x, 1.0f, v.z);
+            }
+
+            if (v.z > 1.0f)
+            {
+                v = new Vector3(v.x, v.y, 1.0f);
+            }
+
+            if (y < 0)
+            {
+                v = new Vector3(v.x, -v.y, v.z);
+            }
+
+            if (z < 0)
+            {
+                v = new Vector3(v.x, v.y, -v.z);
+            }
+
+            if (x > 0)
+            {
+                // Right Face
+                v = new Vector3(1.0f, v.y, v.z);
+            }
+            else
+            {
+                // Left Face
+                v = new Vector3(-1.0f, v.y, v.z);
+            }
+        }
+        else
+        {
+            float a2 = x * x * 2.0f;
+            float b2 = y * y * 2.0f;
+            float inner = -a2 + b2 - 3;
+            float innerSqrt = -Mathf.Sqrt((inner * inner) - 12.0f * a2);
+
+            if (x == 0.0f || x == -0.0f)
+            { 
+                v = new Vector3(0.0f, v.y, v.z);
+            }
+            else
+            {
+                v = new Vector3(Mathf.Sqrt(innerSqrt + a2 - b2 + 3.0f) * inverseSqrt2, v.y, v.z);
+            }
+
+            if (y == 0.0f || y == -0.0f)
+            {
+                v = new Vector3(v.x, 0.0f, v.z);
+            }
+            else
+            {
+                v = new Vector3(v.x, Mathf.Sqrt(innerSqrt - a2 + b2 + 3.0f) * inverseSqrt2, v.z);
+            }
+
+            if (v.x > 1.0f)
+            {
+                v = new Vector3(1.0f, v.y, v.z);
+            }
+
+            if (v.y > 1.0f)
+            {
+                v = new Vector3(v.x, 1.0f, v.z);
+            }
+
+            if (x < 0)
+            {
+                v = new Vector3(-v.x, v.y, v.z);
+            }
+
+            if (y < 0)
+            {
+                v = new Vector3(v.x, -v.y, v.z);
+            }
+
+            if (z > 0)
+            {
+                // Front Face
+                v = new Vector3(v.x, v.y, 1.0f);
+            }
+            else
+            {
+                // Back Face
+                v = new Vector3(v.x, v.y, -1.0f);
+            }
+        }
+
+        return v;
+    }       
+
     public static Matrix4x4 GetJacobianMatrix(float height, float length, float u, float v)
     {
         float h = height;
