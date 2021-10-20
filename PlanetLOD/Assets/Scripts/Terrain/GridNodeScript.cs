@@ -87,7 +87,7 @@ public class GridNodeScript
 
     public void Update(GridNodeScript parent, GridNodeScript thisNode, Vector3 cameraPosition, 
                        float finalResolution, int maxDepth, int divisions, GridFaceType faceType,
-                       float radius, GridPoolScript gridPool)
+                       float radius, GridPoolScript gridPool, Matrix4x4 planetMatrix)
     {
         if(thisNode == null)
         {
@@ -97,7 +97,8 @@ public class GridNodeScript
         {
             Vector3 orientationAngles = GridHelperScript.GetOrientationAngles(faceType);
             Matrix4x4 faceMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(orientationAngles), Vector3.one);
-            Vector3 faceCenter = faceMatrix.MultiplyVector(thisNode.Center);
+            Matrix4x4 finalMatrix = planetMatrix * faceMatrix;
+            Vector3 faceCenter = finalMatrix.MultiplyVector(thisNode.Center);
 
             Vector3 newCenter = GridHelperScript.GetCubeToSpherePosition(faceCenter) * radius;
 
@@ -138,7 +139,8 @@ public class GridNodeScript
                         GridNodeTypes type = (GridNodeTypes)(i + 1);
                         thisNode.Children[i] = new GridNodeScript(thisNode, type, thisNode.Center, thisNode.Size);
                     }
-                    thisNode.Update(thisNode, thisNode.Children[i], cameraPosition, finalResolution, maxDepth, divisions, faceType, radius, gridPool);
+                    thisNode.Update(thisNode, thisNode.Children[i], cameraPosition, finalResolution, maxDepth, divisions, 
+                                    faceType, radius, gridPool, planetMatrix);
                 }
             }
             else

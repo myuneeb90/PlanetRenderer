@@ -37,7 +37,9 @@ public class PlanetScript : MonoBehaviour
     private Vector3 CameraPosition;
     private int ProcessFrameCountOffset;
 
-    public Transform Player;
+    public Vector3 PlanetPosition;
+
+    public CameraScript Player;
     public Transform PlayerCollider;
 
     private CuboidHeightMapScript CuboidHM;
@@ -50,6 +52,8 @@ public class PlanetScript : MonoBehaviour
 
    // private bool FirstFrame = false;
 
+    private Matrix4x4 PlanetMatrix;
+
 
     void Start()
     {
@@ -61,6 +65,9 @@ public class PlanetScript : MonoBehaviour
         GridMaterials.Add(FrontMaterial);
         GridMaterials.Add(BackMaterial);
 
+        CameraPosition = Player.Position;
+        PlanetPosition = PlanetPosition - CameraPosition;
+
         CuboidHM = new CuboidHeightMapScript(HeightMaps[0], HeightMaps[1], HeightMaps[2], 
                                              HeightMaps[3], HeightMaps[4], HeightMaps[5]);
 
@@ -69,20 +76,26 @@ public class PlanetScript : MonoBehaviour
 
     void Update()
     {        
-        Vector3 playerPosition = Player.position.normalized;
+        // Vector3 playerPosition = Player.OffsetPosition.normalized;
 
-        Vector3 uvh = CuboidHM.GetHeightValue(GridHelperScript.GetSphereToCubePosition(playerPosition), GridFaceType.TOP, 0.1f / (float)Divisions);
+        // Vector3 uvh = CuboidHM.GetHeightValue(GridHelperScript.GetSphereToCubePosition(playerPosition), GridFaceType.TOP, 0.1f / (float)Divisions);
 
-        PlayerCollider.position = playerPosition * (1 + uvh.z) * (Radius - 1);
-        PlayerCollider.up = playerPosition;
+        // PlayerCollider.position = playerPosition * (1 + uvh.z) * (Radius - 1);
+        // PlayerCollider.up = playerPosition;
 
-        float d1 = Vector3.Distance(Player.position, Vector3.zero);
-        float d2 = Vector3.Distance(PlayerCollider.position, Vector3.zero);
+        // float d1 = Vector3.Distance(Player.transform.position, Vector3.zero);
+        // float d2 = Vector3.Distance(PlayerCollider.position, Vector3.zero);
 
-        if(d1 < d2)
-        {
-            Player.position = playerPosition * (1 + uvh.z) * (Radius + 1);
-        }
+        // if(d1 < d2)
+        // {
+        //     Player.OffsetPosition = playerPosition * (1 + uvh.z) * (Radius + 1);
+        // }
+
+//        this.transform.position = this.transform.position - Player.OffsetPosition;
+
+    //    CameraPosition = Player.OffsetPosition;
+
+        PlanetMatrix = Matrix4x4.TRS(PlanetPosition, Quaternion.identity, Vector3.one);
         
         this.Render();
     }
@@ -102,7 +115,7 @@ public class PlanetScript : MonoBehaviour
 
         Application.targetFrameRate = 60;
 
-        CameraPosition = Vector3.one;
+        CameraPosition = Player.Position;
 
         ProcessFrameCountOffset = 10;
 
@@ -112,9 +125,10 @@ public class PlanetScript : MonoBehaviour
 
     void Render()
     {
-        if(SceneCamera.transform.position != CameraPosition)
+        if(Player.Position != CameraPosition)
         {
-            CameraPosition = SceneCamera.transform.position;
+            CameraPosition = Player.Position;
+            PlanetPosition = -CameraPosition;
             ProcessFrameCountOffset = 10;
         }
         else
@@ -136,7 +150,7 @@ public class PlanetScript : MonoBehaviour
 
             if(ProcessThread == null && ProcessFrameCountOffset > 0)
             {
-                GridPool.Prepare(SceneCamera, Radius);
+                GridPool.Prepare(SceneCamera, Radius, Player, PlanetMatrix);
 
                 IsProcessDone = false;
 
@@ -148,7 +162,7 @@ public class PlanetScript : MonoBehaviour
 
         if(GridPool != null)
         {
-            GridPool.Render(GridMaterials, SceneCamera);
+            GridPool.Render(GridMaterials, SceneCamera, PlanetMatrix, PlanetPosition);
         }       
     }
 
@@ -156,12 +170,12 @@ public class PlanetScript : MonoBehaviour
     {
         if(IsProcessDone == false)
         {
-            TopFace.Update(CameraPosition, Radius, GridPool);
-            BottomFace.Update(CameraPosition, Radius, GridPool);
-            RightFace.Update(CameraPosition, Radius, GridPool);
-            LeftFace.Update(CameraPosition, Radius, GridPool);
-            FrontFace.Update(CameraPosition, Radius, GridPool);
-            BackFace.Update(CameraPosition, Radius, GridPool);
+            TopFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
+            BottomFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
+            RightFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
+            LeftFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
+            FrontFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
+            BackFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
 
             GridPool.Process(Radius, CuboidHM, Debugger);
         }

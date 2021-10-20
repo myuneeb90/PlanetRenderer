@@ -67,9 +67,8 @@ public class HeightMapScript
         
         int offset = 1;
 
-        int ix = Mathf.Abs((int)(x * Width)) * (int)TileX;
-        int iy = Mathf.Abs((int)(y * Height)) * (int)TileY;
-
+        int ix = Mathf.Abs((int)(x)) * Width * (int)TileX;
+        int iy = Mathf.Abs((int)(y)) * Height * (int)TileY;
 
         float h1 = Data[ix % Width,             iy % Height];
         float h2 = Data[(ix + offset) % Width,  iy % Height];

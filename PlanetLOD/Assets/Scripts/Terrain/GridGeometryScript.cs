@@ -35,9 +35,14 @@ public class GridMeshScript
     private Vector3 v3BackBottomLeft;
     private Vector3 v3BackBottomRight; 
 
+    private Vector3[] BoundingPositions;
+    private Matrix4x4 NormalMatrix;
+    private Vector3 Center;
+
     public GridMeshScript()
     {
         MeshObj = new Mesh();
+        BoundingPositions = new Vector3[8];
     }
 
     public void ComputeBoundingBox(Vector3[] bbPositions)
@@ -77,6 +82,29 @@ public class GridMeshScript
         // v3BackBottomRight  = transform.TransformPoint(v3BackBottomRight);
     }
 
+    public void UpdateBoundingBox(Matrix4x4 planetMatrix, Vector3 planetPosition)
+    {
+        // for(int i = 0; i < BoundingPositions.Length; i++)
+        // {
+        //     BoundingPositions[i] = BoundingPositions[i] + planetPosition;
+        // }
+
+    //    BoundingBox = GeometryUtility.CalculateBounds(BoundingPositions, NormalMatrix);
+    //    BoundingBox.center = BoundingBox.center + planetPosition;//planetMatrix.MultiplyVector(Center + planetPosition);// + planetPosition);
+
+        BoundingBox.center = planetMatrix.MultiplyPoint(Center);
+
+        v3FrontTopLeft     = BoundingPositions[0] + planetPosition;
+        v3FrontTopRight    = BoundingPositions[1] + planetPosition;
+        v3BackTopLeft      = BoundingPositions[2] + planetPosition;
+        v3BackTopRight     = BoundingPositions[3] + planetPosition;
+
+        v3FrontBottomLeft  = BoundingPositions[4] + planetPosition;
+        v3FrontBottomRight = BoundingPositions[5] + planetPosition;
+        v3BackBottomLeft   = BoundingPositions[6] + planetPosition;
+        v3BackBottomRight  = BoundingPositions[7] + planetPosition;
+    }
+
     public void DrawBoundingBox(Color color)
     {
         Debug.DrawLine (v3FrontTopLeft, v3FrontTopRight, color);
@@ -98,47 +126,60 @@ public class GridMeshScript
     public void Prepare(Camera sceneCamera, Vector3[] vertexBuffer, Vector3[] normalBuffer, 
                         Vector2[] texcoordBuffer, Vector4[] tangentBuffer, int[] indexBuffer,
                         Vector3 bbCenter, float size, float radius, GridFaceType faceType,
-                        int divisions, int divOffset)
+                        int divisions, int divOffset, CameraScript cameraScriptInstance,
+                        Matrix4x4 planetMatrix)
     {
         FaceType = faceType;
 
         float distToCenter = (sceneCamera.farClipPlane - sceneCamera.nearClipPlane) / 2.0f;
-        Vector3 center = sceneCamera.transform.position + sceneCamera.transform.forward * distToCenter;
+        Vector3 center = -cameraScriptInstance.Position + sceneCamera.transform.forward * distToCenter;
         float extremeBound = 1000000;
         MeshObj.bounds = new Bounds(center, Vector3.one * extremeBound);
 
-        Vector3[] boundingPositions = new Vector3[8];
+        
 
         Vector3 yOffset = Vector3.up * 50;
 
         int x = 0, z = 0;
-        boundingPositions[0] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TUL
+        BoundingPositions[0] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TUL
         x = divisions + divOffset - 1; z = 0;
-        boundingPositions[1] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TUR
+        BoundingPositions[1] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TUR
         x = 0; z = divisions + divOffset - 1;
-        boundingPositions[2] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TDL
+        BoundingPositions[2] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TDL
         x = divisions + divOffset - 1; z = divisions + divOffset - 1;
-        boundingPositions[3] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TDR
+        BoundingPositions[3] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TDR
 
         x = 0; z = 0;
-        boundingPositions[4] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BUL
+        BoundingPositions[4] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BUL
         x = divisions + divOffset - 1; z = 0;
-        boundingPositions[5] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BUR
+        BoundingPositions[5] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BUR
         x = 0; z = divisions + divOffset - 1;
-        boundingPositions[6] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BDL
+        BoundingPositions[6] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BDL
         x = divisions + divOffset - 1; z = divisions + divOffset - 1;
-        boundingPositions[7] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BDR
+        BoundingPositions[7] = vertexBuffer[x + z * (divisions + divOffset)] - yOffset; // BDR
 
+        // for(int i = 0; i < BoundingPositions.Length; i++)
+        // {
+        //     BoundingPositions[i] = planetMatrix.MultiplyPoint(BoundingPositions[i]);
+        // }
 
-
-        //GeometryUtility.CalculateBounds()
-    //    Transform transform = Matrix4x4.TRS();
         x = (divisions + divOffset - 1) / 2; z = (divisions + divOffset - 1) / 2;
-        Matrix4x4 mat = Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(Vector3.forward, normalBuffer[x + z * (divisions + divOffset)]), Vector3.one);
+        NormalMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(Vector3.forward, normalBuffer[x + z * (divisions + divOffset)]), Vector3.one);
 
-        BoundingBox = GeometryUtility.CalculateBounds(boundingPositions, mat); //new Bounds(bbCenter, new Vector3(size * radius, size * radius, size * radius));
-        BoundingBox.center = bbCenter;
-    //    this.ComputeBoundingBox(boundingPositions);
+        BoundingBox = GeometryUtility.CalculateBounds(BoundingPositions, planetMatrix * NormalMatrix);
+        Center = bbCenter;
+        BoundingBox.center = planetMatrix.MultiplyPoint(bbCenter);
+
+        v3FrontTopLeft     = BoundingPositions[0];
+        v3FrontTopRight    = BoundingPositions[1];
+        v3BackTopLeft      = BoundingPositions[2];
+        v3BackTopRight     = BoundingPositions[3];
+
+        v3FrontBottomLeft  = BoundingPositions[4];
+        v3FrontBottomRight = BoundingPositions[5];
+        v3BackBottomLeft   = BoundingPositions[6];
+        v3BackBottomRight  = BoundingPositions[7];        
+    //    this.ComputeBoundingBox(BoundingPositions);
 
         MeshObj.vertices = vertexBuffer;
         MeshObj.normals = normalBuffer;
@@ -147,11 +188,11 @@ public class GridMeshScript
         MeshObj.triangles = indexBuffer;
     }
 
-    public void Render(Material gridMaterial)
+    public void Render(Material gridMaterial, Matrix4x4 planetMatrix)
     {
         if(MeshObj != null)
         {
-            Graphics.DrawMesh(MeshObj, Matrix4x4.identity, gridMaterial, 0);
+            Graphics.DrawMesh(MeshObj, planetMatrix, gridMaterial, 0);
         }
 
         // for(int i = 0; i < MeshObj.vertices.Length; i++)
@@ -529,10 +570,12 @@ public class GridGeometryScript
         State = GridGeometryStates.ISREADY;
     }
 
-    public void Prepare(Camera sceneCamera, GridMeshScript gridMesh, float radius)
+    public void Prepare(Camera sceneCamera, GridMeshScript gridMesh, float radius, CameraScript cameraScriptInstance,
+                        Matrix4x4 planetMatrix)
     {
         gridMesh.Prepare(sceneCamera, VertexBuffer, NormalBuffer, TexcoordBuffer, TangentBuffer, IndexBuffer,
-                         this.BBCenter, this.Size, (radius / 1.45f), FaceType, this.Divisions, 3);
+                         this.BBCenter, this.Size, (radius / 1.45f), FaceType, this.Divisions, 3, cameraScriptInstance,
+                         planetMatrix);
         State = GridGeometryStates.RENDER;
     }    
 }

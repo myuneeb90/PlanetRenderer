@@ -7,6 +7,8 @@ public class FPSControllerScript : MonoBehaviour
     public Camera SceneCamera;
     public Rigidbody RB;
 
+    public Vector3 OffsetPosition;
+
     public float MouseSensitivityX = 250f;
     public float MouseSensitivityY = 250f;
 
@@ -20,6 +22,12 @@ public class FPSControllerScript : MonoBehaviour
     bool Grounded = false;
     public LayerMask GroundedMask;
 
+    void Awake()
+    {
+        RB.transform.position = this.transform.position;
+        OffsetPosition = this.transform.position;
+        this.transform.position = Vector3.zero;
+    }
 
     void Update()
     {
@@ -41,12 +49,15 @@ public class FPSControllerScript : MonoBehaviour
         }
 
         Grounded = false;
-        Ray ray = new Ray(transform.position, -transform.up);
+        Ray ray = new Ray(OffsetPosition, -transform.up);
         RaycastHit hit;
         if(Physics.Raycast(ray, out hit, 1 + 0.1f, GroundedMask))
         {
             Grounded = true;
         }
+
+        OffsetPosition = RB.transform.position;
+//        this.transform.position = Vector3.zero;
     }
 
     void FixedUpdate()

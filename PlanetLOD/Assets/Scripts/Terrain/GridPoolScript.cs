@@ -64,13 +64,13 @@ public class GridPoolScript
         }    
     }
 
-    public void Prepare(Camera sceneCamera, float radius)
+    public void Prepare(Camera sceneCamera, float radius, CameraScript cameraScriptInstance, Matrix4x4 planetMatrix)
     {
         int prepareCount = PrepareQueue.Count;
         while(PrepareQueue.Count != 0)
         {
             GridGeometryScript grid = PrepareQueue.Dequeue();
-            grid.Prepare(sceneCamera, GridMeshContainer[grid.ID], radius);
+            grid.Prepare(sceneCamera, GridMeshContainer[grid.ID], radius, cameraScriptInstance, planetMatrix);
         }
 
         if(prepareCount > 0)
@@ -81,7 +81,7 @@ public class GridPoolScript
         }
     }
 
-    public void Render(List<Material> gridMaterials, Camera sceneCamera)
+    public void Render(List<Material> gridMaterials, Camera sceneCamera, Matrix4x4 planetMatrix, Vector3 planetPosition)
     {
         FrustumPlanes = GeometryUtility.CalculateFrustumPlanes(sceneCamera);
 
@@ -89,12 +89,11 @@ public class GridPoolScript
         {
             GridMeshScript gridMesh = GridMeshContainer[RenderList[i]];
 
+            gridMesh.UpdateBoundingBox(planetMatrix, planetPosition);
             if (GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
             {            
-           //     if(gridMesh.FaceType == GridFaceType.TOP || gridMesh.FaceType == GridFaceType.RIGHT)// ||
-//                   gridMesh.FaceType == GridFaceType.BACK)
-                gridMesh.Render(gridMaterials[(int)gridMesh.FaceType]);
-          //      gridMesh.DrawBoundingBox(Color.green);
+                gridMesh.Render(gridMaterials[(int)gridMesh.FaceType], planetMatrix);
+                gridMesh.DrawBoundingBox(Color.green);
             }
         }
     }

@@ -23,8 +23,9 @@ public class GridFaceScript
         RootNode = new GridNodeScript(null, GridNodeTypes.ROOT, new Vector3(0, 1, 0), size);
     }
 
-    public void Update(Vector3 cameraPosition, float radius, GridPoolScript gridPool)
+    public void Update(Vector3 cameraPosition, float radius, GridPoolScript gridPool, Matrix4x4 planetMatrix)
     {
-        RootNode.Update(null, RootNode, cameraPosition, FinalResolution, LODDepth, Divisions, FaceType, radius, gridPool);
+        RootNode.Update(null, RootNode, cameraPosition, FinalResolution, LODDepth, Divisions, 
+                        FaceType, radius, gridPool, planetMatrix);
     }
 }
