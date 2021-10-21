@@ -15,7 +15,7 @@ Shader "Sky/AtmosphereImageEffect"
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
-			#pragma target 4.0
+			#pragma target 5.0
 			#include "Atmosphere.cginc"
 			
 			sampler2D _MainTex;
@@ -53,6 +53,7 @@ Shader "Sky/AtmosphereImageEffect"
 			float4 _LightDir;
 			float4 _LightColor;
 			float4x4 unity_WorldToLight;
+			float3 CameraPosition;
 			float _FarPlane;
 			
 			half4 frag (v2f i) : COLOR
@@ -71,14 +72,14 @@ Shader "Sky/AtmosphereImageEffect"
 				
 				
 				float4 surfaceColor = tex2D (_MainTex, i.uv);
-			    float3 viewDir = normalize(wpos-_WorldSpaceCameraPos.xyz);
+			    float3 viewDir = normalize(wpos-CameraPosition);//_WorldSpaceCameraPos.xyz);
 
 				float3 attenuation;
 				float irradianceFactor = 0;
 				float3 inscat = GetInscatteredLight(wpos,viewDir,attenuation,irradianceFactor);
 				float3 reflected = GetReflectedLight(wpos, depth,attenuation,irradianceFactor, normal,surfaceColor);
 
-				//return float4(reflected, 1);
+			//	return float4(reflected, 1);
 				return float4(inscat + reflected,1);
 			}
 			ENDCG

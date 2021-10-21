@@ -48,7 +48,7 @@ public class CuboidHeightMapScript
     public HeightMapScript Front;
     public HeightMapScript Back;
 
-    public int Tiling = 1;
+   // public int Tiling = 1;
     public float Height;
     public float TileX;
     public float TileY;
@@ -66,9 +66,9 @@ public class CuboidHeightMapScript
         Front = new HeightMapScript(front.width, front.height, TileX, TileY, front);
         Back = new HeightMapScript(back.width, back.height, TileX, TileY, back); 
 
-        Tiling = 1;
+   //     Tiling = 1;
 
-        Height = 0.02f;
+        Height = 0.015f;
     }
 
     public Vector3 GetCornerCoords(CuboidCornerType cornerType, float edgeLength, GridFaceType faceType = GridFaceType.NONE)

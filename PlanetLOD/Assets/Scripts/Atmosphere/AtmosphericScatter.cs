@@ -144,8 +144,9 @@ public class AtmosphericScatter : MonoBehaviour
         mat.SetFloat("mieG", m_mieG);
         mat.SetVector("SUN_DIR", m_sun.transform.forward * -1);
         mat.SetFloat("SUN_INTENSITY", m_sunIntensity);
-        mat.SetVector("EARTH_POS", -CameraController.Position);
+        mat.SetVector("EARTH_POS", Vector3.zero);
         mat.SetVector("CAMERA_POS", CameraController.Position);
+		mat.SetVector("CameraPosition", CameraController.Position);
 		mat.SetVector("betaMSca",(Vector4.one * 4e-3f)/SCALE);
 		mat.SetVector("betaMEx",(Vector4.one * 4e-3f * 0.9f)/SCALE);
 
