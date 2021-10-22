@@ -34,6 +34,8 @@ public class AtmosphericScatter : MonoBehaviour
 
 	private CommandBuffer lightingBuffer;
 	public new Camera camera;
+//	public Transform Player;
+	public Transform Planet;
 
 	public float MinViewDistance = 3000;
 
@@ -127,6 +129,7 @@ public class AtmosphericScatter : MonoBehaviour
 		Matrix4x4 CameraInv = camera.cameraToWorldMatrix.inverse;
 		lightingBuffer.SetGlobalMatrix("_CameraInv", CameraInv);
 		lightingBuffer.SetGlobalMatrix("_ViewMatrix", camera.worldToCameraMatrix);
+	//	lightingBuffer.SetGlobalMatrix("_CameraToWorld",  camera.cameraToWorldMatrix);
 		lightingBuffer.SetGlobalFloat("_FarPlane", camera.farClipPlane);
 		lightingBuffer.SetGlobalTexture("_CameraDepthNormalsTexture", BuiltinRenderTextureType.GBuffer2);
 		RenderTargetIdentifier active = new RenderTargetIdentifier(BuiltinRenderTextureType.GBuffer0);
@@ -145,8 +148,8 @@ public class AtmosphericScatter : MonoBehaviour
         mat.SetVector("SUN_DIR", m_sun.transform.forward * -1);
         mat.SetFloat("SUN_INTENSITY", m_sunIntensity);
         mat.SetVector("EARTH_POS", Vector3.zero);
-        mat.SetVector("CAMERA_POS", CameraController.Position);
-		mat.SetVector("CameraPosition", CameraController.Position);
+        mat.SetVector("CAMERA_POS", CameraController.transform.position);
+		mat.SetVector("CameraPosition", CameraController.transform.position);
 		mat.SetVector("betaMSca",(Vector4.one * 4e-3f)/SCALE);
 		mat.SetVector("betaMEx",(Vector4.one * 4e-3f * 0.9f)/SCALE);
 

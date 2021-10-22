@@ -174,12 +174,13 @@ MonoBehaviour:
   m_sunIntensity: 10
   m_writeData: {fileID: 7200000, guid: 5cdb2cc072e4642478a167d00a5cdeb2, type: 3}
   CameraController: {fileID: 1729456174}
-  RG: 2048
-  RT: 2154
-  RL: 2155
+  RG: 6360
+  RT: 6620
+  RL: 6621
   HR: 6
   HM: 36
   camera: {fileID: 91448577}
+  Planet: {fileID: 834735150}
   MinViewDistance: 100000
   m_transmittance: {fileID: 0}
   m_inscatter: {fileID: 0}
@@ -332,7 +333,7 @@ MonoBehaviour:
   Size: 2048
   Divisions: 32
   GridPoolCount: 500
-  Radius: 2048
+  Radius: 6360
   SceneCamera: {fileID: 91448577}
   TopMaterial: {fileID: 2100000, guid: 8743c4d295b30ac40a5ec82570439642, type: 2}
   BottomMaterial: {fileID: 2100000, guid: a76623737c20c65478438e8919c2bd19, type: 2}
@@ -347,7 +348,6 @@ MonoBehaviour:
   - {fileID: 2800000, guid: fe3db1af59e9d0246934a31ae7c91d58, type: 3}
   - {fileID: 2800000, guid: 1fb2c85ba038bb0469bb0726d8e7124c, type: 3}
   - {fileID: 2800000, guid: d5611ad7a50602944bcea4f4bfa00e29, type: 3}
-  PlanetPosition: {x: 0, y: 0, z: 0}
   Player: {fileID: 1729456174}
   PlayerCollider: {fileID: 1967426154}
   Debugger: {fileID: 1204827946}
@@ -706,7 +706,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa5df250250303140968f7d4897c6b3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Position: {x: 0, y: 0, z: 0}
+  Planet: {fileID: 834735150}
   OffsetPosition: {x: 0, y: 0, z: 0}
   LinearSpeed: 250
   AngularSpeed: 100
@@ -719,7 +719,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1729456173}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2200, z: 0}
+  m_LocalPosition: {x: 0, y: 6400, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 91448574}

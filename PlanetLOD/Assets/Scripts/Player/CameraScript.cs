@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CameraScript : MonoBehaviour 
 {
-    public Vector3 Position = Vector3.zero;
+//    public Vector3 Position = Vector3.zero;
+    public Transform Planet;
     public Vector3 OffsetPosition = Vector3.zero;
     public float LinearSpeed = 10;
     public float AngularSpeed = 50;
@@ -12,9 +13,9 @@ public class CameraScript : MonoBehaviour
 
     void Awake()
     {
-        OffsetPosition = this.transform.position;
-        Position = this.transform.position;
-        this.transform.position = Vector3.zero;
+    //    OffsetPosition = this.transform.position;
+    //    Planet.transform.position = this.transform.position;
+   //     this.transform.position = Vector3.zero;
     }
 
     void Update()
@@ -38,7 +39,8 @@ public class CameraScript : MonoBehaviour
         Vector3 upVelocity = this.transform.rotation * Vector3.up * Input.GetAxis("Up") * LinearSpeed * Time.deltaTime;
 
         Vector3 finalVelocity = forwardVelocity + rightVelocity + upVelocity;
-        OffsetPosition = finalVelocity;
-        Position = Position + OffsetPosition;
+        this.transform.position = this.transform.position + finalVelocity;
+
+    //    Planet.transform.position = Planet.transform.position - OffsetPosition;
     }
 }

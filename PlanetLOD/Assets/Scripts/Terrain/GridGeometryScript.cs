@@ -132,7 +132,7 @@ public class GridMeshScript
         FaceType = faceType;
 
         float distToCenter = (sceneCamera.farClipPlane - sceneCamera.nearClipPlane) / 2.0f;
-        Vector3 center = -cameraScriptInstance.Position + sceneCamera.transform.forward * distToCenter;
+        Vector3 center = -cameraScriptInstance.Planet.position + sceneCamera.transform.forward * distToCenter;
         float extremeBound = 1000000;
         MeshObj.bounds = new Bounds(center, Vector3.one * extremeBound);
 

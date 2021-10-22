@@ -1,3 +1,10 @@
+// Upgrade NOTE: replaced '_CameraToWorld' with 'unity_CameraToWorld'
+
+// Upgrade NOTE: commented out 'float4x4 _CameraToWorld', a built-in variable
+// Upgrade NOTE: replaced '_CameraToWorld' with 'unity_CameraToWorld'
+
+// Upgrade NOTE: commented out 'float4x4 _CameraToWorld', a built-in variable
+
 Shader "Sky/AtmosphereImageEffect"
 {
 	Properties 
@@ -20,7 +27,8 @@ Shader "Sky/AtmosphereImageEffect"
 			
 			sampler2D _MainTex;
 			
-			struct appdata {
+			struct appdata 
+			{
 				float4 vertex : POSITION;
 				float3 texcoord : TEXCOORD0;
 			};
@@ -48,7 +56,7 @@ Shader "Sky/AtmosphereImageEffect"
 			float4x4 _ViewProjectInverse;
 			float4x4 _CameraInv;
 			float4x4 _ViewMatrix;
-			// float4x4 _CameraToWorld;
+		//	 float4x4 CameraToWorld;
 			float4 _CamScreenDir;
 			float4 _LightDir;
 			float4 _LightColor;
@@ -69,10 +77,11 @@ Shader "Sky/AtmosphereImageEffect"
     			float3 viewNorm = mul(_CameraInv,normal);
 				float4 vpos = float4(ray * depth,0.995);
     			float3 wpos = mul (unity_CameraToWorld, vpos).xyz;  
+    	//		float3 wpos = mul (CameraToWorld, vpos).xyz;  
 				
 				
 				float4 surfaceColor = tex2D (_MainTex, i.uv);
-			    float3 viewDir = normalize(wpos-CameraPosition);//_WorldSpaceCameraPos.xyz);
+			    float3 viewDir = normalize(wpos - CameraPosition);//_WorldSpaceCameraPos.xyz);
 
 				float3 attenuation;
 				float irradianceFactor = 0;

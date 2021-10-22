@@ -34,10 +34,10 @@ public class PlanetScript : MonoBehaviour
     public GridPoolScript GridPool;
     private Thread ProcessThread = null;
     private bool IsProcessDone;
-    private Vector3 CameraPosition;
+    private Vector3 LastPosition;
     private int ProcessFrameCountOffset;
 
-    public Vector3 PlanetPosition;
+  //  public Vector3 PlanetPosition;
 
     public CameraScript Player;
     public Transform PlayerCollider;
@@ -65,8 +65,10 @@ public class PlanetScript : MonoBehaviour
         GridMaterials.Add(FrontMaterial);
         GridMaterials.Add(BackMaterial);
 
-        CameraPosition = Player.Position;
-        PlanetPosition = PlanetPosition - CameraPosition;
+        LastPosition = Player.transform.position;
+    //    LastPosition = -Player.Position;
+//        PlanetPosition = -LastCameraPosition;
+    //    this.transform.position = LastPosition;
 
         CuboidHM = new CuboidHeightMapScript(HeightMaps[0], HeightMaps[1], HeightMaps[2], 
                                              HeightMaps[3], HeightMaps[4], HeightMaps[5]);
@@ -95,7 +97,9 @@ public class PlanetScript : MonoBehaviour
 
     //    CameraPosition = Player.OffsetPosition;
 
-        PlanetMatrix = Matrix4x4.TRS(PlanetPosition, Quaternion.identity, Vector3.one);
+   //     PlanetMatrix = Matrix4x4.TRS(PlanetPosition, Quaternion.identity, Vector3.one);
+
+        PlanetMatrix = this.transform.localToWorldMatrix;
         
         this.Render();
     }
@@ -115,7 +119,7 @@ public class PlanetScript : MonoBehaviour
 
         Application.targetFrameRate = 60;
 
-        CameraPosition = Player.Position;
+    //    LastCameraPosition = Player.Position;
 
         ProcessFrameCountOffset = 10;
 
@@ -125,10 +129,12 @@ public class PlanetScript : MonoBehaviour
 
     void Render()
     {
-        if(Player.Position != CameraPosition)
+        if(Player.transform.position != LastPosition)
         {
-            CameraPosition = Player.Position;
-            PlanetPosition = -CameraPosition;
+          //  LastCameraPosition = -Player.Position;
+          //  PlanetPosition = -LastCameraPosition;
+           // this.transform.position = LastCameraPosition;
+            LastPosition = Player.transform.position;
             ProcessFrameCountOffset = 10;
         }
         else
@@ -150,7 +156,7 @@ public class PlanetScript : MonoBehaviour
 
             if(ProcessThread == null && ProcessFrameCountOffset > 0)
             {
-                GridPool.Prepare(SceneCamera, Radius, Player, PlanetMatrix);
+                GridPool.Prepare(SceneCamera, Radius, Player, this.transform.localToWorldMatrix);
 
                 IsProcessDone = false;
 
@@ -162,7 +168,7 @@ public class PlanetScript : MonoBehaviour
 
         if(GridPool != null)
         {
-            GridPool.Render(GridMaterials, SceneCamera, PlanetMatrix, PlanetPosition);
+            GridPool.Render(GridMaterials, SceneCamera, this.transform.localToWorldMatrix, this.transform.position);
         }       
     }
 
@@ -170,12 +176,12 @@ public class PlanetScript : MonoBehaviour
     {
         if(IsProcessDone == false)
         {
-            TopFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
-            BottomFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
-            RightFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
-            LeftFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
-            FrontFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
-            BackFace.Update(CameraPosition, Radius, GridPool, PlanetMatrix);
+            TopFace.Update(LastPosition, Radius, GridPool, PlanetMatrix);
+            BottomFace.Update(LastPosition, Radius, GridPool, PlanetMatrix);
+            RightFace.Update(LastPosition, Radius, GridPool, PlanetMatrix);
+            LeftFace.Update(LastPosition, Radius, GridPool, PlanetMatrix);
+            FrontFace.Update(LastPosition, Radius, GridPool, PlanetMatrix);
+            BackFace.Update(LastPosition, Radius, GridPool, PlanetMatrix);
 
             GridPool.Process(Radius, CuboidHM, Debugger);
         }
