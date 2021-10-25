@@ -39,7 +39,8 @@ public class PlanetScript : MonoBehaviour
 
   //  public Vector3 PlanetPosition;
 
-    public CameraScript Player;
+    public Transform Player;
+    public Rigidbody PlayerRB;
     public Transform PlayerCollider;
 
     private CuboidHeightMapScript CuboidHM;
@@ -78,20 +79,7 @@ public class PlanetScript : MonoBehaviour
 
     void Update()
     {        
-        // Vector3 playerPosition = Player.OffsetPosition.normalized;
 
-        // Vector3 uvh = CuboidHM.GetHeightValue(GridHelperScript.GetSphereToCubePosition(playerPosition), GridFaceType.TOP, 0.1f / (float)Divisions);
-
-        // PlayerCollider.position = playerPosition * (1 + uvh.z) * (Radius - 1);
-        // PlayerCollider.up = playerPosition;
-
-        // float d1 = Vector3.Distance(Player.transform.position, Vector3.zero);
-        // float d2 = Vector3.Distance(PlayerCollider.position, Vector3.zero);
-
-        // if(d1 < d2)
-        // {
-        //     Player.OffsetPosition = playerPosition * (1 + uvh.z) * (Radius + 1);
-        // }
 
 //        this.transform.position = this.transform.position - Player.OffsetPosition;
 
@@ -102,6 +90,38 @@ public class PlanetScript : MonoBehaviour
         PlanetMatrix = this.transform.localToWorldMatrix;
         
         this.Render();
+    }
+
+    void FixedUpdate()
+    {
+        Vector3 playerPosition = Player.position.normalized;
+
+        Vector3 stcPos = GridHelperScript.GetSphereToCubePosition(playerPosition);
+
+        stcPos.x = Mathf.Round(stcPos.x * 10000) * 0.0001f;
+        stcPos.y = Mathf.Round(stcPos.y * 10000) * 0.0001f;
+        stcPos.z = Mathf.Round(stcPos.z * 10000) * 0.0001f;
+
+        float edgeLength = 0.1f / (float)Divisions;
+
+        edgeLength = Mathf.Round(edgeLength * 10000) * 0.0001f;
+
+        Vector3 uvh = CuboidHM.GetHeightValue(stcPos, GridFaceType.TOP, edgeLength);
+
+      //  PlayerRB.isKinematic = true;
+     //   Player.position = playerPosition * (1 + uvh.z) * (Radius + 4);
+     //   PlayerRB.isKinematic = false;
+
+        PlayerCollider.position = Vector3.MoveTowards(PlayerCollider.position, playerPosition * (1 + uvh.z) * (Radius), 20 * Time.deltaTime);
+        PlayerCollider.up = playerPosition;
+
+        float d1 = Vector3.Distance(Player.transform.position, Vector3.zero);
+        float d2 = Vector3.Distance(PlayerCollider.position, Vector3.zero);
+
+        if(d1 < d2)
+        {
+            Player.position = playerPosition * (1 + uvh.z) * (Radius + 4);
+        }
     }
 
     void Construct()

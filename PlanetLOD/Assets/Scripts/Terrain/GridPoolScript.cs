@@ -64,13 +64,13 @@ public class GridPoolScript
         }    
     }
 
-    public void Prepare(Camera sceneCamera, float radius, CameraScript cameraScriptInstance, Matrix4x4 planetMatrix)
+    public void Prepare(Camera sceneCamera, float radius, Transform player, Matrix4x4 planetMatrix)
     {
         int prepareCount = PrepareQueue.Count;
         while(PrepareQueue.Count != 0)
         {
             GridGeometryScript grid = PrepareQueue.Dequeue();
-            grid.Prepare(sceneCamera, GridMeshContainer[grid.ID], radius, cameraScriptInstance, planetMatrix);
+            grid.Prepare(sceneCamera, GridMeshContainer[grid.ID], radius, player, planetMatrix);
         }
 
         if(prepareCount > 0)

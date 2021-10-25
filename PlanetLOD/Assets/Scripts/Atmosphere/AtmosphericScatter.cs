@@ -27,15 +27,16 @@ public class AtmosphericScatter : MonoBehaviour
     public float m_mieG = 0.75f;
     public float m_sunIntensity = 100.0f;
     public ComputeShader m_writeData;
-    public CameraScript CameraController;
+    public Transform Player;
     public float RG = 6360.0f, RT = 6420.0f, RL = 6421.0f;
     public float HR = 8;
     public float HM = 1.2f;
 
 	private CommandBuffer lightingBuffer;
+	[HideInInspector]
 	public new Camera camera;
 //	public Transform Player;
-	public Transform Planet;
+//	public Transform Planet;
 
 	public float MinViewDistance = 3000;
 
@@ -148,8 +149,8 @@ public class AtmosphericScatter : MonoBehaviour
         mat.SetVector("SUN_DIR", m_sun.transform.forward * -1);
         mat.SetFloat("SUN_INTENSITY", m_sunIntensity);
         mat.SetVector("EARTH_POS", Vector3.zero);
-        mat.SetVector("CAMERA_POS", CameraController.transform.position);
-		mat.SetVector("CameraPosition", CameraController.transform.position);
+        mat.SetVector("CAMERA_POS", Player.position);
+		mat.SetVector("CameraPosition", Player.position);
 		mat.SetVector("betaMSca",(Vector4.one * 4e-3f)/SCALE);
 		mat.SetVector("betaMEx",(Vector4.one * 4e-3f * 0.9f)/SCALE);
 

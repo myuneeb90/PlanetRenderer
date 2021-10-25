@@ -22,12 +22,12 @@ public class FPSControllerScript : MonoBehaviour
     bool Grounded = false;
     public LayerMask GroundedMask;
 
-    void Awake()
-    {
-        RB.transform.position = this.transform.position;
-        OffsetPosition = this.transform.position;
-        this.transform.position = Vector3.zero;
-    }
+    // void Awake()
+    // {
+    //     RB.transform.position = this.transform.position;
+    //     OffsetPosition = this.transform.position;
+    //     this.transform.position = Vector3.zero;
+    // }
 
     void Update()
     {
@@ -49,14 +49,14 @@ public class FPSControllerScript : MonoBehaviour
         }
 
         Grounded = false;
-        Ray ray = new Ray(OffsetPosition, -transform.up);
+        Ray ray = new Ray(this.transform.position, -transform.up);
         RaycastHit hit;
         if(Physics.Raycast(ray, out hit, 1 + 0.1f, GroundedMask))
         {
             Grounded = true;
         }
 
-        OffsetPosition = RB.transform.position;
+//        OffsetPosition = RB.transform.position;
 //        this.transform.position = Vector3.zero;
     }
 
