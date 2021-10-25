@@ -19,7 +19,7 @@ public class FPSControllerScript : MonoBehaviour
     public float MoveSpeed = 10;
 
     public float JumpForce = 220;
-    bool Grounded = false;
+    public bool Grounded = false;
     public LayerMask GroundedMask;
 
     // void Awake()
@@ -48,12 +48,15 @@ public class FPSControllerScript : MonoBehaviour
             }
         }
 
-        Grounded = false;
+    //    Grounded = false;
         Ray ray = new Ray(this.transform.position, -transform.up);
         RaycastHit hit;
-        if(Physics.Raycast(ray, out hit, 1 + 0.1f, GroundedMask))
+        if(Physics.Raycast(ray, out hit, 1 + 0.1f))
         {
-            Grounded = true;
+            if(hit.transform.tag.Equals("Surface"))
+            {
+                Grounded = true;
+            }
         }
 
 //        OffsetPosition = RB.transform.position;

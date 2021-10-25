@@ -7,10 +7,26 @@ using UnityEngine;
 //     public int ID;
 // }
 
+public class GridMeshColliderScript
+{
+    public bool IsEmpty = false;
+    public Vector3 Center;
+    public MeshCollider Collider;
+
+    public GridMeshColliderScript(MeshCollider collider)
+    {
+        Collider = collider;
+        IsEmpty = true;
+    }
+}
+
 public class GridPoolScript
 {
     public List<GridGeometryScript> Container;
     public List<GridMeshScript> GridMeshContainer;
+
+    // public GridMeshScript ColliderMesh;
+    // public GridGeometryScript ColliderGeometry;
 
     public Queue<GridGeometryScript> PrepareQueue;
     public Queue<GridGeometryScript> ProcessQueue;
@@ -21,6 +37,8 @@ public class GridPoolScript
     public Plane[] FrustumPlanes; 
 
     public int ProcessCount = 0;
+
+    private int CIdx;
 
     public GridPoolScript(int gridCount, float size, int divisions)
     {
@@ -33,6 +51,8 @@ public class GridPoolScript
             GridMeshScript gridMesh = new GridMeshScript();
             GridMeshContainer.Add(gridMesh);
         }           
+
+        CIdx = 0;
 
         PrepareQueue = new Queue<GridGeometryScript>();
         ProcessQueue = new Queue<GridGeometryScript>();
@@ -64,7 +84,8 @@ public class GridPoolScript
         }    
     }
 
-    public void Prepare(Camera sceneCamera, float radius, Transform player, Matrix4x4 planetMatrix)
+    public void Prepare(Camera sceneCamera, float radius, Transform player, Matrix4x4 planetMatrix,
+                        List<GridMeshColliderScript> colliders)
     {
         int prepareCount = PrepareQueue.Count;
         while(PrepareQueue.Count != 0)
@@ -78,6 +99,40 @@ public class GridPoolScript
             RenderList.Clear();
             RenderList.AddRange(ReadyList);
             ReadyList.Clear();
+        
+//            FrustumPlanes = GeometryUtility.CalculateFrustumPlanes(sceneCamera);
+
+            for(int i = 0; i < colliders.Count; i++)
+            {
+                if(colliders[i].IsEmpty == false)
+                {
+                    float distance = Vector3.Distance(colliders[i].Center, sceneCamera.transform.position);
+                    if(distance > 500)
+                    {
+                        colliders[i].IsEmpty = true;
+                        colliders[i].Collider.sharedMesh = null;
+                    }
+                }
+            }
+
+            for(int i = 0; i < RenderList.Count; i++)
+            {
+                GridMeshScript gridMesh = GridMeshContainer[RenderList[i]];
+                float distance = Vector3.Distance(gridMesh.Center, sceneCamera.transform.position);            
+                if(gridMesh.LODIndex == 5 && distance <= 500)// && GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
+                {
+                    for(int j = 0; j < colliders.Count; j++)
+                    {
+                        if(colliders[j].IsEmpty == true)
+                        {
+                            colliders[j].Collider.sharedMesh = gridMesh.MeshObj;
+                            colliders[j].IsEmpty = false;
+                            colliders[j].Center = gridMesh.Center;
+                            break;
+                        }
+                    }
+                }
+            }          
         }
     }
 
@@ -89,11 +144,11 @@ public class GridPoolScript
         {
             GridMeshScript gridMesh = GridMeshContainer[RenderList[i]];
 
-            gridMesh.UpdateBoundingBox(planetMatrix, planetPosition);
+       //     gridMesh.UpdateBoundingBox(planetMatrix, planetPosition);
             if (GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
             {            
                 gridMesh.Render(gridMaterials[(int)gridMesh.FaceType], planetMatrix);
-                gridMesh.DrawBoundingBox(Color.green);
+            //    gridMesh.DrawBoundingBox(Color.green);
             }
         }
     }

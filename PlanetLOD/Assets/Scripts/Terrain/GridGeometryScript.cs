@@ -37,7 +37,8 @@ public class GridMeshScript
 
     private Vector3[] BoundingPositions;
     private Matrix4x4 NormalMatrix;
-    private Vector3 Center;
+    public Vector3 Center;
+    public int LODIndex;
 
     public GridMeshScript()
     {
@@ -107,6 +108,8 @@ public class GridMeshScript
 
     public void DrawBoundingBox(Color color)
     {
+        Debug.DrawLine(BoundingBox.center, BoundingBox.center + Vector3.up * 300, Color.yellow);
+
         Debug.DrawLine (v3FrontTopLeft, v3FrontTopRight, color);
         Debug.DrawLine (v3FrontTopRight, v3FrontBottomRight, color);
         Debug.DrawLine (v3FrontBottomRight, v3FrontBottomLeft, color);
@@ -127,20 +130,22 @@ public class GridMeshScript
                         Vector2[] texcoordBuffer, Vector4[] tangentBuffer, int[] indexBuffer,
                         Vector3 bbCenter, float size, float radius, GridFaceType faceType,
                         int divisions, int divOffset, Transform player,
-                        Matrix4x4 planetMatrix)
+                        Matrix4x4 planetMatrix, int lodIndex)
     {
         FaceType = faceType;
+        LODIndex = lodIndex;
 
         float distToCenter = (sceneCamera.farClipPlane - sceneCamera.nearClipPlane) / 2.0f;
         Vector3 center = -player.position + sceneCamera.transform.forward * distToCenter;
         float extremeBound = 1000000;
         MeshObj.bounds = new Bounds(center, Vector3.one * extremeBound);
 
-        
+        int x = 0, z = 0;        
+        x = (divisions + divOffset) / 2; z = (divisions + divOffset) / 2;
+        Center = vertexBuffer[x + z * (divisions + divOffset)];        
 
-        Vector3 yOffset = Vector3.up * 50;
-
-        int x = 0, z = 0;
+        Vector3 yOffset = Vector3.up * 100;
+        x = 0; z = 0;
         BoundingPositions[0] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TUL
         x = divisions + divOffset - 1; z = 0;
         BoundingPositions[1] = vertexBuffer[x + z * (divisions + divOffset)] + yOffset; // TUR
@@ -165,9 +170,11 @@ public class GridMeshScript
 
         x = (divisions + divOffset - 1) / 2; z = (divisions + divOffset - 1) / 2;
         NormalMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(Vector3.forward, normalBuffer[x + z * (divisions + divOffset)]), Vector3.one);
-        BoundingBox = GeometryUtility.CalculateBounds(BoundingPositions, planetMatrix * NormalMatrix);
-        Center = bbCenter;
-        BoundingBox.center = bbCenter;//planetMatrix.MultiplyPoint(bbCenter);
+        BoundingBox = GeometryUtility.CalculateBounds(BoundingPositions, NormalMatrix);
+        
+
+
+        BoundingBox.center = Center;//planetMatrix.MultiplyPoint(bbCenter);
 
         v3FrontTopLeft     = BoundingPositions[0];
         v3FrontTopRight    = BoundingPositions[1];
@@ -215,6 +222,8 @@ public class GridGeometryScript
 
     public GridGeometryStates State;
     public int ID;
+
+    public int LODIndex;
 
     public Vector3[] VertexBuffer;
     public Vector3[] NormalBuffer;
@@ -574,7 +583,7 @@ public class GridGeometryScript
     {
         gridMesh.Prepare(sceneCamera, VertexBuffer, NormalBuffer, TexcoordBuffer, TangentBuffer, IndexBuffer,
                          this.BBCenter, this.Size, (radius / 1.45f), FaceType, this.Divisions, 3, player,
-                         planetMatrix);
+                         planetMatrix, this.LODIndex);
         State = GridGeometryStates.RENDER;
     }    
 }

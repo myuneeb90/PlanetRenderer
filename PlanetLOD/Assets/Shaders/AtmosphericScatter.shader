@@ -86,9 +86,10 @@ Shader "Sky/AtmosphereImageEffect"
 				float3 attenuation;
 				float irradianceFactor = 0;
 				float3 inscat = GetInscatteredLight(wpos,viewDir,attenuation,irradianceFactor);
-				float3 reflected = GetReflectedLight(wpos, depth,attenuation,irradianceFactor, normal,surfaceColor);
+				float3 reflected = GetReflectedLight(wpos, depth,attenuation,irradianceFactor, normal, surfaceColor);
 
-			//	return float4(reflected, 1);
+			//	return float4(vpos.x, vpos.y, vpos.z, vpos.w);
+			//	return float4(attenuation, 1);
 				return float4(inscat + reflected,1);
 			}
 			ENDCG

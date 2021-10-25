@@ -11,6 +11,7 @@ public class PlanetScript : MonoBehaviour
     public float Size = 2.0f;
     public int Divisions;
     public int GridPoolCount;
+    public int GridColliderPoolCount;
     public float Radius;
 
     public Camera SceneCamera;
@@ -38,6 +39,8 @@ public class PlanetScript : MonoBehaviour
     private int ProcessFrameCountOffset;
 
   //  public Vector3 PlanetPosition;
+    public GameObject ColliderPrefab;
+    private List<GridMeshColliderScript> Colliders;
 
     public Transform Player;
     public Rigidbody PlayerRB;
@@ -55,9 +58,22 @@ public class PlanetScript : MonoBehaviour
 
     private Matrix4x4 PlanetMatrix;
 
+    private void SpawnColliders()
+    {
+        Colliders = new List<GridMeshColliderScript>();
+        for(int i = 0; i < GridColliderPoolCount; i++)
+        {
+            GameObject newCollider = (GameObject)Instantiate(ColliderPrefab, Vector3.zero, Quaternion.identity);
+            newCollider.transform.SetParent(this.transform);
+            Colliders.Add(new GridMeshColliderScript(newCollider.GetComponent<MeshCollider>()));
+        }
+    }
+
 
     void Start()
     {
+        this.SpawnColliders();
+
         GridMaterials = new List<Material>();
         GridMaterials.Add(TopMaterial);
         GridMaterials.Add(BottomMaterial);
@@ -74,7 +90,7 @@ public class PlanetScript : MonoBehaviour
         CuboidHM = new CuboidHeightMapScript(HeightMaps[0], HeightMaps[1], HeightMaps[2], 
                                              HeightMaps[3], HeightMaps[4], HeightMaps[5]);
 
-        this.Construct();
+        this.Construct(); 
     }
 
     void Update()
@@ -94,34 +110,36 @@ public class PlanetScript : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector3 playerPosition = Player.position.normalized;
+    //      Vector3 playerPosition = Player.position.normalized;
 
-        Vector3 stcPos = GridHelperScript.GetSphereToCubePosition(playerPosition);
+    //      Vector3 stcPos = GridHelperScript.GetSphereToCubePosition(playerPosition);
 
-        stcPos.x = Mathf.Round(stcPos.x * 10000) * 0.0001f;
-        stcPos.y = Mathf.Round(stcPos.y * 10000) * 0.0001f;
-        stcPos.z = Mathf.Round(stcPos.z * 10000) * 0.0001f;
+    //      stcPos.x = Mathf.Round(stcPos.x * 10000) * 0.0001f;
+    //      stcPos.y = Mathf.Round(stcPos.y * 10000) * 0.0001f;
+    //      stcPos.z = Mathf.Round(stcPos.z * 10000) * 0.0001f;
 
-        float edgeLength = 0.1f / (float)Divisions;
+    //      float edgeLength = 0.1f / (float)Divisions;
 
-        edgeLength = Mathf.Round(edgeLength * 10000) * 0.0001f;
+    //      edgeLength = Mathf.Round(edgeLength * 10000) * 0.0001f;
 
-        Vector3 uvh = CuboidHM.GetHeightValue(stcPos, GridFaceType.TOP, edgeLength);
+    //      Vector3 uvh = CuboidHM.GetHeightValue(stcPos, GridFaceType.TOP, edgeLength);
 
-      //  PlayerRB.isKinematic = true;
-     //   Player.position = playerPosition * (1 + uvh.z) * (Radius + 4);
-     //   PlayerRB.isKinematic = false;
+    // //   //  PlayerRB.isKinematic = true;
+    // //  //   Player.position = playerPosition * (1 + uvh.z) * (Radius + 4);
+    // //  //   PlayerRB.isKinematic = false;
 
-        PlayerCollider.position = Vector3.MoveTowards(PlayerCollider.position, playerPosition * (1 + uvh.z) * (Radius), 20 * Time.deltaTime);
-        PlayerCollider.up = playerPosition;
+    // //     PlayerCollider.position = Vector3.MoveTowards(PlayerCollider.position, playerPosition * (1 + uvh.z) * (Radius), 20 * Time.deltaTime);
+    // //     PlayerCollider.up = playerPosition;
 
-        float d1 = Vector3.Distance(Player.transform.position, Vector3.zero);
-        float d2 = Vector3.Distance(PlayerCollider.position, Vector3.zero);
+    //     Vector3 surfacePos = playerPosition * (1 + uvh.z) * (Radius);
 
-        if(d1 < d2)
-        {
-            Player.position = playerPosition * (1 + uvh.z) * (Radius + 4);
-        }
+    //     float d1 = Vector3.Distance(Player.transform.position, Vector3.zero);
+    //     float d2 = Vector3.Distance(surfacePos, Vector3.zero);
+
+    //     if(d1 < d2)
+    //     {
+    //         Player.position = surfacePos;
+    //     }
     }
 
     void Construct()
@@ -176,7 +194,7 @@ public class PlanetScript : MonoBehaviour
 
             if(ProcessThread == null && ProcessFrameCountOffset > 0)
             {
-                GridPool.Prepare(SceneCamera, Radius, Player, this.transform.localToWorldMatrix);
+                GridPool.Prepare(SceneCamera, Radius, Player, this.transform.localToWorldMatrix, Colliders);
 
                 IsProcessDone = false;
 

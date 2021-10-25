@@ -255,7 +255,7 @@ float3 GetInscatteredLight(float3 surfacePos,float3 viewDir,inout float3 attenua
 				 float muEndPos = dot(surfacePos, viewDir) / surfacePosHeight; 
 				 inscatterSurface = Texture4D(_Inscatter, surfacePosHeight, muEndPos, musEndPos, nuStartPos);
 				 inscatter = max(inscatter-attenuation.rgbr*inscatterSurface, 0.0f); 
-				 //inscatter = inscatter - inscatterSurface;
+			//	 inscatter = inscatter - inscatterSurface;
 				 irradianceFactor = 1.0f;
 			} 
 			else 
@@ -296,7 +296,7 @@ float3 GetInscatteredLight(float3 surfacePos,float3 viewDir,inout float3 attenua
 				 // avoids imprecision problems in Mie scattering when sun is below 
 				 //horizon 
 				 // fíx described in chapter 5.1.3 
-				 //inscatter.w *= smoothstep(0.00, 0.02, musStartPos);
+				// inscatter.w *= smoothstep(0.00, 0.02, musStartPos);
 				 inscatter.w *= smoothstep(0.35, 0.7, musStartPos);
 				 
 				 float phaseR = PhaseFunctionR(nuStartPos); 
@@ -313,8 +313,8 @@ float3 GetReflectedLight(float3 surfacePos,float depth,float3 attenuation,float 
 { 
  // decode normal and determine intensity of refected light at 
  // surface postiion 
-	if (depth > 0.0)
-	{
+//	if (depth >= 0.0)
+//	{
 		float3 normal = 2.0f * normalData.xyz - 1.0f;
 		float lightScale = max(dot(normal, SUN_DIR), 0.0f);
 		float lightIntensity = SUN_INTENSITY * normalData.w;
@@ -329,15 +329,15 @@ float3 GetReflectedLight(float3 surfacePos,float depth,float3 attenuation,float 
 
 		float3 groundColor = surfaceColor * (max(musSurfacePos, 0)*sunLight + groundSkyLight) * lightIntensity / M_PI;
 
-		//return attenuation;
+	//	return attenuation;
 		return attenuation * groundColor;
-	}
-	else
+//	}
+//	else
 	{
-		return 0;
+//		return 0;
 	}
- //return attenuation * groundColor * lightIntensity * musSurfacePos;
- //return reflectedLight * attenuation * irradianceFactor * lightIntensity + irradianceSurface + reflectedLight;
+// return attenuation * groundColor * lightIntensity * musSurfacePos;
+// return reflectedLight * attenuation * irradianceFactor * lightIntensity + irradianceSurface;// + reflectedLight;
 }
 
 

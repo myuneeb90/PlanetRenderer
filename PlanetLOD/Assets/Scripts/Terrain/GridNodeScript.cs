@@ -172,7 +172,7 @@ public class GridNodeScript
                             gridPool.Container[i].Size = thisNode.Size;
                             gridPool.Container[i].Center = thisNode.Center;
                             gridPool.Container[i].BBCenter = newCenter;
-                            
+                            gridPool.Container[i].LODIndex = thisNode.LODIndex;
                             gridPool.Container[i].Divisions = divisions;
                             gridPool.Container[i].FaceType = faceType;
                             gridPool.Container[i].State = GridGeometryStates.INPROCESS;
