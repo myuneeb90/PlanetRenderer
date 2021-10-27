@@ -38,7 +38,6 @@ public class GridPoolScript
 
     public int ProcessCount = 0;
 
-    private int CIdx;
 
     public GridPoolScript(int gridCount, float size, int divisions)
     {
@@ -52,15 +51,13 @@ public class GridPoolScript
             GridMeshContainer.Add(gridMesh);
         }           
 
-        CIdx = 0;
-
         PrepareQueue = new Queue<GridGeometryScript>();
         ProcessQueue = new Queue<GridGeometryScript>();
         ReadyList = new List<int>();
         RenderList = new List<int>();
     }
 
-    public void Process(float radius, CuboidHeightMapScript cuboidHM, DebuggerScript debugger)
+    public void Process(float radius, CuboidPrecisionHeightMapScript cuboidHM, DebuggerScript debugger)
     {
         while(ProcessQueue.Count != 0)
         {
@@ -85,7 +82,7 @@ public class GridPoolScript
     }
 
     public void Prepare(Camera sceneCamera, float radius, Transform player, Matrix4x4 planetMatrix,
-                        List<GridMeshColliderScript> colliders)
+                        List<GridMeshColliderScript> colliders, float colliderRange, int lodDepth)
     {
         int prepareCount = PrepareQueue.Count;
         while(PrepareQueue.Count != 0)
@@ -107,7 +104,7 @@ public class GridPoolScript
                 if(colliders[i].IsEmpty == false)
                 {
                     float distance = Vector3.Distance(colliders[i].Center, sceneCamera.transform.position);
-                    if(distance > 500)
+                    if(distance > colliderRange)
                     {
                         colliders[i].IsEmpty = true;
                         colliders[i].Collider.sharedMesh = null;
@@ -119,7 +116,7 @@ public class GridPoolScript
             {
                 GridMeshScript gridMesh = GridMeshContainer[RenderList[i]];
                 float distance = Vector3.Distance(gridMesh.Center, sceneCamera.transform.position);            
-                if(gridMesh.LODIndex == 5 && distance <= 500)// && GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
+                if(gridMesh.LODIndex == (lodDepth - 1) && distance <= colliderRange)// && GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
                 {
                     for(int j = 0; j < colliders.Count; j++)
                     {

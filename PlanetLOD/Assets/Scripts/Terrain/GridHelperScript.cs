@@ -50,6 +50,15 @@ public class GridHelperScript
         return new Vector3(x, y, z);
     } 
 
+    public static Vector3d GetCubeToSpherePosition(Vector3d v)
+    {
+        double x = v.x * Mathd.Sqrt(1 - ((v.y * v.y) / 2) - ((v.z * v.z) / 2) + (((v.y * v.y) * (v.z * v.z)) / 3));
+        double y = v.y * Mathd.Sqrt(1 - ((v.z * v.z) / 2) - ((v.x * v.x) / 2) + (((v.z * v.z) * (v.x * v.x)) / 3));
+        double z = v.z * Mathd.Sqrt(1 - ((v.x * v.x) / 2) - ((v.y * v.y) / 2) + (((v.x * v.x) * (v.y * v.y)) / 3));
+
+        return new Vector3d(x, y, z);
+    }     
+
     public static Vector3 GetSphereToCubePosition(Vector3 v)
     {
         float x, y, z;

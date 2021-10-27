@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public enum GridFaceType
 {
@@ -218,7 +219,7 @@ public class GridGeometryScript
  //   public GridMeshScript GridMesh;
    // public Material GridMaterial;
     public GridFaceType FaceType;
-    public Matrix4x4 FaceMatrix;
+    public Matrix4x4d FaceMatrix;
 
     public GridGeometryStates State;
     public int ID;
@@ -373,13 +374,13 @@ public class GridGeometryScript
         return ((a - b) < 0 ? ((a - b) * -1) : (a - b)) <= threshold;
     }
 
-    public void Process(float radius, CuboidHeightMapScript cuboidHM, DebuggerScript debugger)
+    public void Process(float radius, CuboidPrecisionHeightMapScript cuboidHM, DebuggerScript debugger)
     {
         Vector3 orientationAngles = GridHelperScript.GetOrientationAngles(FaceType);
-        FaceMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(orientationAngles), Vector3.one);
+        FaceMatrix = Matrix4x4d.TRS(Vector3.zero, orientationAngles, Vector3.one);
 
-        float edgeLength = Size / (float)Divisions;
-        float halfSize = Size / 2 + edgeLength;
+        double edgeLength = Size / (double)Divisions;
+        double halfSize = Size / 2 + edgeLength;
         int divOffset = 3;
         int divOffsetMinusOne =  divOffset - 1; 
 
@@ -398,8 +399,8 @@ public class GridGeometryScript
             for(int x = 0; x < Divisions + divOffset; x++)
             {      
                 int idx = x + z * (Divisions + divOffset);
-                Vector3 vertex = new Vector3();
-                Vector3 edgeVertex = new Vector3();
+                Vector3d vertex = new Vector3d();
+                Vector3d edgeVertex = new Vector3d();
 
                 vertex.x = Center.x + (-halfSize + edgeLength * x);
                 vertex.z = Center.z + (halfSize - edgeLength * z);
@@ -438,8 +439,8 @@ public class GridGeometryScript
                         vertex.z = vertex.z + edgeLength;
                     }
 
-                    if(Mathf.Approximately(Mathf.Abs(vertex.x), 1.0f) == true ||
-                       Mathf.Approximately(Mathf.Abs(vertex.z), 1.0f) == true)
+                    if(Mathd.Approximately(Mathd.Abs(vertex.x), 1.0f) == true ||
+                       Mathd.Approximately(Mathd.Abs(vertex.z), 1.0f) == true)
                     {
                         edgeVertex.x = vertex.x;
                         edgeVertex.z = vertex.z;
@@ -447,42 +448,41 @@ public class GridGeometryScript
                     }                      
                 }
 
-                GridFaceType selectedFace = FaceType;
+                Vector3d cubePos = FaceMatrix.MultiplyVector(vertex);
+                Vector3d edgeCubePos = FaceMatrix.MultiplyVector(edgeVertex);
 
-                Vector3 cubePos = FaceMatrix.MultiplyVector(vertex);
-                Vector3 edgeCubePos = FaceMatrix.MultiplyVector(edgeVertex);
+                // edgeCubePos.x = Mathd.Round(edgeCubePos.x * 10000000) * 0.0000001f;
+                // edgeCubePos.y = Mathd.Round(edgeCubePos.y * 10000000) * 0.0000001f;
+                // edgeCubePos.z = Mathd.Round(edgeCubePos.z * 10000000) * 0.0000001f;
 
-                edgeCubePos.x = Mathf.Round(edgeCubePos.x * 10000) * 0.0001f;
-                edgeCubePos.y = Mathf.Round(edgeCubePos.y * 10000) * 0.0001f;
-                edgeCubePos.z = Mathf.Round(edgeCubePos.z * 10000) * 0.0001f;
+                // Vector3 spherePos = GridHelperScript.GetCubeToSpherePosition(cubePos);
+                // Vector3 edgeSpherePos = GridHelperScript.GetCubeToSpherePosition(edgeCubePos);
 
-                Vector3 spherePos = GridHelperScript.GetCubeToSpherePosition(cubePos);
-                Vector3 edgeSpherePos = GridHelperScript.GetCubeToSpherePosition(edgeCubePos);
+                Vector3d spherePosD = GridHelperScript.GetCubeToSpherePosition(new Vector3d(cubePos.x, cubePos.y, cubePos.z));
+                Vector3d edgeSpherePosD = GridHelperScript.GetCubeToSpherePosition(new Vector3d(edgeCubePos.x, edgeCubePos.y, edgeCubePos.z));
 
-                Vector3 uvh = cuboidHM.GetHeightValue(cubePos, FaceType, edgeLength);
-                Vector3 edgeUvh = new Vector3();
+                Vector3d uvh = cuboidHM.GetHeightValue(cubePos, FaceType, edgeLength);
+                Vector3d edgeUvh = cuboidHM.GetHeightValue(edgeCubePos, FaceType, edgeLength);
 
-                edgeUvh = cuboidHM.GetHeightValue(edgeCubePos, selectedFace, edgeLength);
-
-                Vector3 finalSpherePos = new Vector3();
+                Vector3d finalSpherePos = new Vector3d();
 
                 if(x > 0 && z > 0 && x < Divisions + divOffsetMinusOne && z < Divisions + divOffsetMinusOne)
                 {
-                    finalSpherePos = spherePos * (1 + uvh.z) * radius;
+                    finalSpherePos = (spherePosD * (1 + uvh.z) * radius);
                 }
                 else
                 {
-                    finalSpherePos = spherePos * (1 + uvh.z - edgeLength) * radius;
+                    finalSpherePos = spherePosD * (1 + uvh.z - edgeLength) * radius;
                 }
 
-                Vector3 finalEdgeSpherePos = edgeSpherePos * (1 + edgeUvh.z) * radius;
+                Vector3d finalEdgeSpherePos = edgeSpherePosD * (1 + edgeUvh.z) * radius;
 
-                VertexBuffer[idx] = finalSpherePos;
-                edgeVertices[idx] = finalEdgeSpherePos;
+                VertexBuffer[idx] = new Vector3((float)finalSpherePos.x, (float)finalSpherePos.y, (float)finalSpherePos.z);
+                edgeVertices[idx] = new Vector3((float)finalEdgeSpherePos.x, (float)finalEdgeSpherePos.y, (float)finalEdgeSpherePos.z);
                 
-                TexcoordBuffer[idx] = new Vector2(uvh.x, uvh.y);
-                tileUVs[idx] = new Vector2(edgeLength + (float)x / (float)(Divisions), 
-                                           edgeLength + (float)z / (float)Divisions);
+                TexcoordBuffer[idx] = new Vector2((float)uvh.x, (float)uvh.y);
+                tileUVs[idx] = new Vector2((float)(edgeLength + (float)x / (float)(Divisions)), 
+                                           (float)(edgeLength + (float)z / (float)Divisions));
             }
         }
 

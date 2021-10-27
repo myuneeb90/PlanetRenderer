@@ -11,6 +11,7 @@ public class PlanetScript : MonoBehaviour
     public float Size = 2.0f;
     public int Divisions;
     public int GridPoolCount;
+    public float GridColliderRange = 500;
     public int GridColliderPoolCount;
     public float Radius;
 
@@ -46,7 +47,7 @@ public class PlanetScript : MonoBehaviour
     public Rigidbody PlayerRB;
     public Transform PlayerCollider;
 
-    private CuboidHeightMapScript CuboidHM;
+    private CuboidPrecisionHeightMapScript CuboidHM;
 
    // private bool IsReady = false;
 
@@ -87,8 +88,8 @@ public class PlanetScript : MonoBehaviour
 //        PlanetPosition = -LastCameraPosition;
     //    this.transform.position = LastPosition;
 
-        CuboidHM = new CuboidHeightMapScript(HeightMaps[0], HeightMaps[1], HeightMaps[2], 
-                                             HeightMaps[3], HeightMaps[4], HeightMaps[5]);
+        CuboidHM = new CuboidPrecisionHeightMapScript(HeightMaps[0], HeightMaps[1], HeightMaps[2], 
+                                                      HeightMaps[3], HeightMaps[4], HeightMaps[5]);
 
         this.Construct(); 
     }
@@ -194,7 +195,7 @@ public class PlanetScript : MonoBehaviour
 
             if(ProcessThread == null && ProcessFrameCountOffset > 0)
             {
-                GridPool.Prepare(SceneCamera, Radius, Player, this.transform.localToWorldMatrix, Colliders);
+                GridPool.Prepare(SceneCamera, Radius, Player, this.transform.localToWorldMatrix, Colliders, GridColliderRange, this.LODDepth);
 
                 IsProcessDone = false;
 
