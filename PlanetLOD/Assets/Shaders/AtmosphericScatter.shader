@@ -90,7 +90,7 @@ Shader "Sky/AtmosphereImageEffect"
 
 			//	return float4(vpos.x, vpos.y, vpos.z, vpos.w);
 			//	return float4(attenuation, 1);
-				return float4(inscat + reflected,1);
+				return float4(inscat + hdr(reflected),1);
 			}
 			ENDCG
 	    }

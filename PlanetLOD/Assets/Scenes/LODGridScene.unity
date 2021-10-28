@@ -177,8 +177,8 @@ MonoBehaviour:
   RG: 6310
   RT: 6620
   RL: 6621
-  HR: 6
-  HM: 36
+  HR: 1
+  HM: 1
   camera: {fileID: 91448577}
   MinViewDistance: 100000
   m_transmittance: {fileID: 0}
@@ -329,7 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7419aa1d5289bc74d830fa52ce1e77e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LODDepth: 7
+  LODDepth: 5
   Size: 2048
   Divisions: 32
   GridPoolCount: 500
@@ -344,12 +344,12 @@ MonoBehaviour:
   FrontMaterial: {fileID: 2100000, guid: 9df89b2f1b0c6bf419db7f9ee7406d01, type: 2}
   BackMaterial: {fileID: 2100000, guid: 5f44c3efc6cfcf44b8161b872a75e6d3, type: 2}
   HeightMaps:
-  - {fileID: 2800000, guid: 068550d64ab0350438dea4dbffc766f1, type: 3}
-  - {fileID: 2800000, guid: 068550d64ab0350438dea4dbffc766f1, type: 3}
-  - {fileID: 2800000, guid: 068550d64ab0350438dea4dbffc766f1, type: 3}
-  - {fileID: 2800000, guid: 068550d64ab0350438dea4dbffc766f1, type: 3}
-  - {fileID: 2800000, guid: 068550d64ab0350438dea4dbffc766f1, type: 3}
-  - {fileID: 2800000, guid: 068550d64ab0350438dea4dbffc766f1, type: 3}
+  - {fileID: 2800000, guid: 3fa9daadd74fe8d47ad7693959440852, type: 3}
+  - {fileID: 2800000, guid: 8770bf3ecf273114ba83075aef486649, type: 3}
+  - {fileID: 2800000, guid: c2df496164f00534f863cdebbceebcbf, type: 3}
+  - {fileID: 2800000, guid: fe3db1af59e9d0246934a31ae7c91d58, type: 3}
+  - {fileID: 2800000, guid: 1fb2c85ba038bb0469bb0726d8e7124c, type: 3}
+  - {fileID: 2800000, guid: d5611ad7a50602944bcea4f4bfa00e29, type: 3}
   ColliderPrefab: {fileID: 2116842438180508617, guid: 4d52030e64dc03545acf2e9b2ceb5b2a,
     type: 3}
   Player: {fileID: 1729456177}
@@ -770,8 +770,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1729456173}
-  m_LocalRotation: {x: -0.15532768, y: -0.81579226, z: 0.42447832, w: -0.3607969}
-  m_LocalPosition: {x: 3642.5703, y: 3841.2747, z: -3777.1025}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 6360, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 91448574}

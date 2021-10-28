@@ -40,12 +40,12 @@ public class PrecisionHeightMapScript
   //      return this.ApplyBicubicFilter(x, y);
 //        if(vtype == HeightValueType.CORNER || vtype == HeightValueType.EDGE)
 //        {
-    //    return Data[Mathd.Abs((int)(x * TileX * Width)) % Width, Mathd.Abs((int)(y * TileY * Height)) % Height];
+        return Data[Mathd.Abs((int)(x * TileX * Width)) % Width, Mathd.Abs((int)(y * TileY * Height)) % Height];
 //        }
         // else
         // {
         //    return this.ApplyBilinearFilter(x, y);
-            return this.ApplyCubicFilter(x, y);
+    //        return this.ApplyCubicFilter(x, y);
         // }
       //  double h2 = Data[Mathd.Abs((int)(x * Width)) * (int)4 % Width, Mathd.Abs((int)(y * Height)) * (int)4 % Height];
       //  return (h1 + h2) / 2;// h1 + h2 * 0.25f;//(h1 + h2) / 2;
