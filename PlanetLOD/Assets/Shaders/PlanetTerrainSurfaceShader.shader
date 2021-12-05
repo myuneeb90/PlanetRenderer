@@ -6,7 +6,8 @@
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
-        _EnvMap("Normal Environment Map", CUBE) = "" {}
+        _EnvMap("Normal Environment Map", 2D) = "" {}
+        _Tiling("Tiling", Float) = 1
     }
     SubShader
     {
@@ -26,14 +27,16 @@
         {
             float2 uv_MainTex;
             float3 worldPos;
-            float3 worldRefl;
+            float3 worldNormal;
+            // float3 worldRefl;
             INTERNAL_DATA
         };
 
         half _Glossiness;
         half _Metallic;
         fixed4 _Color;
-        samplerCUBE _EnvMap;
+        sampler2D _EnvMap;
+        float _Tiling;
 
         // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
         // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -42,15 +45,34 @@
             // put more per-instance properties here
         UNITY_INSTANCING_BUFFER_END(Props)
 
+        float2 pointOnSphereToUV(float3 p)
+        {
+            p = normalize(p);
+
+            float longitude = atan2(p.x, -p.z);
+            float latitude = asin(p.y);
+
+            const float PI = 3.14159;
+            float u = (longitude / PI + 1) / 2;
+            float v = (latitude / PI) + 0.5f;
+            return float2(u, v);
+        }
+
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
             // Albedo comes from a texture tinted by color
-            fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
+
+            float2 uv = pointOnSphereToUV(IN.worldPos) * _Tiling;
+
+
+
+            fixed4 c = tex2D (_MainTex, uv) * _Color;
             o.Albedo = c.rgb;
             // Metallic and smoothness come from slider variables
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-            o.Normal = UnpackNormal(texCUBE(_EnvMap, normalize(IN.worldPos))).rgb;
+ //           o.Metallic = _Metallic;
+ //           o.Smoothness = _Glossiness;
+            o.Normal = UnpackNormal(tex2D(_EnvMap, uv));
+         //   o.Normal = texCUBE(_EnvMap, normalize(IN.worldPos)).rgb;
             o.Alpha = c.a;
         }
         ENDCG

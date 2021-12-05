@@ -142,7 +142,7 @@ public class GridPoolScript
             GridMeshScript gridMesh = GridMeshContainer[RenderList[i]];
 
        //     gridMesh.UpdateBoundingBox(planetMatrix, planetPosition);
-            if (GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
+         //   if (GeometryUtility.TestPlanesAABB(this.FrustumPlanes, gridMesh.BoundingBox))
             {            
                 gridMesh.Render(gridMaterials[(int)gridMesh.FaceType], planetMatrix);
             //    gridMesh.DrawBoundingBox(Color.green);

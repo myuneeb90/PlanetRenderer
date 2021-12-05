@@ -18,8 +18,8 @@ public class CuboidPrecisionHeightMapScript
     public CuboidPrecisionHeightMapScript(Texture2D top, Texture2D bottom, Texture2D right, 
                                           Texture2D left, Texture2D front, Texture2D back)
     {
-        TileX = 2;
-        TileY = 2;
+        TileX = 1;
+        TileY = 1;
 
         Top = new PrecisionHeightMapScript(top.width, top.height, TileX, TileY, top);
         Bottom = new PrecisionHeightMapScript(bottom.width, bottom.height, TileX, TileY, bottom);
